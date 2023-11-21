@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="680.0" prefWidth="860.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClosedTrades.InDepthStats.inDepthStatsView">
+
+
+
+    <stylesheets>
+        <URL value="@Style.css" />
+    </stylesheets>
+   <children>
+      <HBox alignment="TOP_CENTER" layoutX="160.0" layoutY="104.0" prefHeight="73.0" prefWidth="327.0" AnchorPane.leftAnchor="160.0" AnchorPane.rightAnchor="373.0" AnchorPane.topAnchor="104.0">
+         <children>
+            <VBox prefHeight="73.0" prefWidth="106.0">
+               <children>
+                  <Label text="From">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <DatePicker fx:id="datePickStartDate" prefHeight="26.0" prefWidth="105.0">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </DatePicker>
+               </children>
+               <HBox.margin>
+                  <Insets right="50.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox prefHeight="73.0" prefWidth="109.0">
+               <children>
+                  <Label text="Until">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <DatePicker fx:id="datePickEndDate" prefHeight="26.0" prefWidth="105.0" />
+               </children>
+            </VBox>
+            <VBox alignment="BOTTOM_CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleSearch" prefHeight="25.0" prefWidth="65.0" text="Confirm">
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox fx:id="topPane" alignment="CENTER_RIGHT" layoutY="-7.0" onMouseDragged="#handleMovement" onMousePressed="#handleMoveWindowAction" prefHeight="42.0" prefWidth="860.0" style="-fx-background-color: black;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-12.0">
+         <children>
+            <HBox alignment="TOP_CENTER" prefHeight="29.0" prefWidth="61.0">
+               <HBox.margin>
+                  <Insets right="675.0" top="15.0" />
+               </HBox.margin>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="18.0" prefWidth="43.0">
+               <children>
+                  <Text fx:id="txtMinize" fill="WHITE" onMouseClicked="#minimize" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: grey;" text="_" wrappingWidth="17.3759765625">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets bottom="10.0" />
+                     </HBox.margin>
+                  </Text>
+               </children>
+            </HBox>
+            <Rectangle fx:id="rectangleOpenWindow" arcHeight="1.0" arcWidth="1.0" fill="#656666" height="20.0" onMouseClicked="#maximize" stroke="BLACK" strokeType="INSIDE" width="20.0">
+               <HBox.margin>
+                  <Insets right="20.0" top="10.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Text fx:id="txtCloseWindow" fill="WHITE" onMouseClicked="#close" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-family: Arial; -fx-fill: grey;" text="X">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="10.0" top="10.0" />
+               </HBox.margin>
+            </Text>
+         </children>
+      </HBox>
+      <VBox layoutX="160.0" layoutY="30.0" prefHeight="42.0" prefWidth="314.0" AnchorPane.leftAnchor="160.0" AnchorPane.rightAnchor="386.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <Label text="In depth stats ">
+               <font>
+                  <Font size="46.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <TableView fx:id="tblSymbols" layoutX="26.0" layoutY="241.0" prefHeight="385.0" prefWidth="157.0" AnchorPane.bottomAnchor="54.0">
+        <columns>
+          <TableColumn fx:id="tblSymbol" prefWidth="75.0" text="Symbols" />
+            <TableColumn fx:id="tblResult" prefWidth="75.0" text="Result" />
+        </columns>
+      </TableView>
+      <TableView fx:id="tblInDepthStats" layoutX="183.0" layoutY="241.0" prefHeight="386.0" prefWidth="310.0" AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="183.0">
+        <columns>
+          <TableColumn fx:id="tblDate" prefWidth="75.0" text="Date" />
+          <TableColumn fx:id="tblSide" prefWidth="75.0" text="Side" />
+            <TableColumn fx:id="tblUnits" prefWidth="75.0" text="Units" />
+            <TableColumn fx:id="tblPrice" prefWidth="75.0" text="Price" />
+        </columns>
+      </TableView>
+      <FlowPane layoutX="510.0" layoutY="283.0" prefHeight="343.0" prefWidth="314.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="303.0" text="Trade stats">
+               <font>
+                  <Font size="26.0" />
+               </font>
+            </Label>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="\$ PNL">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblDolPnl" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="\% PNL">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblPercentPnl" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Adj R PNL">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblAdjrPnl" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Open price">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblOpenPrice" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Close price">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblClosePrice" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Transactions">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTransactions" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Open value">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblOpenValue" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Close value">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblCloseValue" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Inside Risk?">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblInsideRisk" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Open date">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblOpenDate" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Close Date">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblCloseDate" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Days held">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTimeHeld" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Best close price">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblBestClosePrice" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="Best close R">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblBestCloseR" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox fx:id="boxId" alignment="TOP_CENTER" prefHeight="58.0" prefWidth="100.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="100.0" text="R taken">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblRTaken" alignment="CENTER" contentDisplay="CENTER" prefHeight="31.0" prefWidth="100.0">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </FlowPane>
+      <FlowPane layoutX="514.0" layoutY="43.0" prefHeight="195.0" prefWidth="303.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="300.0" text="Market ">
+               <font>
+                  <Font size="26.0" />
+               </font>
+               <FlowPane.margin>
+                  <Insets bottom="10.0" />
+               </FlowPane.margin>
+            </Label>
+            <HBox alignment="CENTER_LEFT" prefHeight="44.0" prefWidth="300.0">
+               <children>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label contentDisplay="CENTER" text="QQQ">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblQQQ" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="75.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblQQQAtrdist" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="94.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblAtrTo10MAQQQ" text="ATR to 10MA">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="44.0" prefWidth="300.0">
+               <children>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label contentDisplay="CENTER" text="SPY">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblSPY" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="76.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblSPYAtrdist" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="94.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblAtrTo10MASPY" text="ATR to 10MA">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="44.0" prefWidth="300.0">
+               <children>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label contentDisplay="CENTER" text="IWM">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblIWM" alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="83.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="boxId" alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label fx:id="lblIWMAtrdist" alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="94.0">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblAtrTo10MAIWM" text="ATR to 10MA">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </FlowPane>
+      <Pane layoutX="492.0" layoutY="266.0" prefHeight="3.0" prefWidth="368.0" style="-fx-background-color: #bdbdbd;" AnchorPane.leftAnchor="492.0" AnchorPane.rightAnchor="0.0" />
+      <HBox layoutX="26.0" layoutY="197.0" prefHeight="44.0" prefWidth="462.0">
+         <children>
+            <Label fx:id="lblResultOfSearch" prefHeight="35.0" prefWidth="266.0" text="Top 10 trades">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblSymbol" prefHeight="35.0" prefWidth="91.0" text="Symbol?">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <VBox layoutX="58.0" layoutY="109.0" prefHeight="97.0" prefWidth="67.0">
+         <children>
+            <Spinner fx:id="spinner" editable="true" prefHeight="22.0" prefWidth="63.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Spinner>
+            <CheckBox fx:id="cbWinners" mnemonicParsing="false" text="Winners" textFill="#eeeeee" />
+            <CheckBox fx:id="cbLosers" mnemonicParsing="false" text="Losers" textFill="#eeeeee">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </CheckBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

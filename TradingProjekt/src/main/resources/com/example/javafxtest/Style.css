@@ -1,0 +1,152 @@
+
+.root{
+    -fx-background-color:#212121;
+    -fx-font-family: "Times New Roman";
+}
+
+
+.label {
+    -fx-text-fill: #eeeeee;
+}
+
+.button
+{
+    -fx-background-color: #78909c;
+    -fx-background-radius: 15;
+    -fx-text-fill: white;
+}
+.toggle-button {
+    -fx-background-radius: 15;
+    -fx-background-color:#bdbdbd;
+}
+.button:hover
+{
+   -fx-background-color:#bdbdbd;
+}
+.toggle-button:hover
+{
+    -fx-background-color:#bdbdbd;
+}
+
+
+.table-view
+{
+       -fx-background-color:#9e9e9e ;
+     -fx-border-color: #616161;
+      -fx-color :#757575;
+}
+
+.table-row-cell {
+     -fx-background-color:#bdbdbd ;
+     -fx-border-color: #757575;
+ }
+
+
+#tglBuy:selected, #tglLong:selected, #tglBuyOP:selected, #tglSell:selected, #tglShort:selected, #tglSellOP:selected
+{
+    -fx-background-color:#90a4ae;
+}
+
+.text-field {
+    -fx-background-color: #757575; /* Set the background color */
+    -fx-text-fill: white; /* Set the text color */
+    /*-fx-font-size:13;
+    /* Add other style properties as needed */
+}
+
+
+.choice-box {
+    -fx-background-color: #757575; /* Set the background color */
+    -fx-text-fill: white; /* Set the text color */
+    /* Add other style properties as needed */
+}
+.choice-box .context-menu .menu-item {
+    -fx-background-color: #757575; /* Set the background color */
+}
+
+.date-picker
+{
+    -fx-background-color: #78909c;
+
+}
+.date-picker-popup .month-year-pane {
+	-fx-background-color:  #757575;
+
+}
+.date-picker .cell {
+	-fx-background-color: #bdbdbd ;
+}
+
+
+#boxId
+{
+    -fx-border-color: #757575;
+}
+#boxMarketId
+{
+   -fx-border-color: #757575;
+}
+#boxMarketAtrId
+{
+   -fx-border-color: #757575;
+
+}
+
+/* Line chart style*/
+.invisibleBox{
+    -fx-background-color: transparent;
+}
+.chart
+{
+    -fx-font-size:15;
+   -fx-text-fill: red;
+}
+
+.chart-plot-background
+{
+    -fx-background-color:#757575;
+}
+.default-color0.chart-series-line
+{
+    -fx-stroke: #D58A11;
+   /* #D58A11;*/
+}
+
+
+/* barchart */
+.default-color0.chart-bar
+ {
+    -fx-bar-fill: #D58A11; /* Customize bar color */
+}
+
+
+
+/* Title bar*/
+#txtCloseWindow:hover{
+    -fx-font-size: 20;
+    -fx-cursor:hand;
+}
+#txtMinize:hover
+{
+    -fx-font-size: 22;
+    -fx-cursor:hand;
+}
+#rectangleOpenWindow:hover
+{
+    -fx-cursor:hand;
+}
+#rectangleOpenWindow
+{
+   -fx-fill: #212121; /* Set the fill color to a specific color, such as #ff5733 (orange) */
+   -fx-stroke: grey;
+}
+
+
+#btnSwitchWindow
+ {
+-fx-background-color:  #212121;
+    -fx-background-radius: 1;
+    -fx-text-fill: white;
+    -fx-font-size:12;
+
+ }

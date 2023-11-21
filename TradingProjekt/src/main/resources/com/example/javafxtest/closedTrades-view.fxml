@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="680.0" prefWidth="860.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClosedTrades.ClosedTradesView">
+   <children>
+      <Pane layoutX="14.0" layoutY="60.0" prefHeight="250.0" prefWidth="341.0">
+         <children>
+            <VBox layoutX="198.0" prefHeight="245.0" prefWidth="143.0">
+               <children>
+                  <Label fx:id="lblResult" prefHeight="35.0" prefWidth="146.0" text="?">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblProfitFactor" prefHeight="43.0" prefWidth="151.0" text="?" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label fx:id="lblWinLoss" prefHeight="38.0" prefWidth="153.0" text="?" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label fx:id="lblWinFrequency" prefHeight="38.0" prefWidth="144.0" text="?" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label fx:id="lblAveragePercent" prefHeight="33.0" prefWidth="152.0" text="? " textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label fx:id="lblAverageR" prefHeight="35.0" prefWidth="151.0" text="? " textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label fx:id="lblAverageAdjR" prefHeight="38.0" prefWidth="147.0" text="? " textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox layoutX="8.0" prefHeight="213.0" prefWidth="159.0">
+               <children>
+                  <Label prefHeight="35.0" prefWidth="137.0" text="Total result">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="159.0" text="Profit factor" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="159.0" text="Win/loss ratio" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="163.0" text="Win frequency" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="155.0" text="Average %" textAlignment="CENTER" textFill="#a19d9d">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="155.0" text="Average R" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+                  <Label prefHeight="35.0" prefWidth="163.0" text="Average adjR" textAlignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </Pane>
+      <BarChart fx:id="barChart" layoutX="341.0" layoutY="370.0" legendVisible="false" prefHeight="306.0" prefWidth="519.0" title="Trade distribution" verticalGridLinesVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <xAxis>
+          <CategoryAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </BarChart>
+      <LineChart fx:id="lineChart" cache="true" layoutX="334.0" legendVisible="false" prefHeight="320.0" prefWidth="528.0" title="PNL chart" verticalGridLinesVisible="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+        <xAxis>
+          <CategoryAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Pane layoutX="341.0" layoutY="359.0" prefHeight="3.0" prefWidth="519.0" style="-fx-background-color: #bdbdbd;" AnchorPane.bottomAnchor="318.0" AnchorPane.leftAnchor="341.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="359.0" />
+      <HBox fx:id="topPane" alignment="CENTER_RIGHT" layoutY="-10.0" onMouseDragged="#handleMovement" onMousePressed="#handleMoveWindowAction" prefHeight="42.0" prefWidth="860.0" style="-fx-background-color: black;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-12.0">
+         <children>
+            <HBox alignment="TOP_CENTER" prefHeight="29.0" prefWidth="61.0">
+               <children>
+                  <Button fx:id="btnSwitchWindow" mnemonicParsing="false" onAction="#switchScene" prefHeight="22.0" prefWidth="65.0" text="Positions">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="675.0" top="15.0" />
+               </HBox.margin>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="18.0" prefWidth="43.0">
+               <children>
+                  <Text fx:id="txtMinize" fill="WHITE" onMouseClicked="#minimize" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: grey;" text="_" wrappingWidth="17.3759765625">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets bottom="10.0" />
+                     </HBox.margin>
+                  </Text>
+               </children>
+            </HBox>
+            <Rectangle fx:id="rectangleOpenWindow" arcHeight="1.0" arcWidth="1.0" fill="#656666" height="20.0" onMouseClicked="#maximize" stroke="BLACK" strokeType="INSIDE" width="20.0">
+               <HBox.margin>
+                  <Insets right="20.0" top="10.0" />
+               </HBox.margin>
+            </Rectangle>
+            <Text fx:id="txtCloseWindow" fill="WHITE" onMouseClicked="#close" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-family: Arial; -fx-fill: grey;" text="X">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="10.0" top="10.0" />
+               </HBox.margin>
+            </Text>
+         </children>
+      </HBox>
+      <Button fx:id="btnDepth" layoutX="38.0" layoutY="485.0" mnemonicParsing="false" onAction="#inDepthView" prefHeight="42.0" prefWidth="294.0" text="In depth stats" />
+   </children>
+
+   <stylesheets>
+      <URL value="@Style.css" />
+   </stylesheets>
+</AnchorPane>
