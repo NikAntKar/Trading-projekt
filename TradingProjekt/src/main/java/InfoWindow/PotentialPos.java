@@ -26,11 +26,13 @@ public class PotentialPos {
         this.threeRtarget = threeRtarget;
         if(side=='B')
         {
-            rangeVAtr = f.formatDoubleXX((price-lod)/atr);
+            if(price > 0 || lod > 0 || atr > 0)
+                rangeVAtr = f.formatDoubleXX((price-lod)/atr);
         }
         else
         {
-            rangeVAtr = f.formatDoubleXX((hod-price)/atr);
+            if(price > 0 || hod > 0 || atr > 0)
+                rangeVAtr = f.formatDoubleXX((hod-price)/atr);
         }
     }
     double rangeVAtr;

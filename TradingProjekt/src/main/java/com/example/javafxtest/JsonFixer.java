@@ -24,12 +24,14 @@ public class JsonFixer {
 
     }
 
+    String file1 = "OpenPositions.json";
+    String file2 = "OpenPositionsTest.json";
 
     public void add(OpenPos openPos)
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         ArrayList<OpenPos> o = new ArrayList<OpenPos>();
 
             try {
@@ -55,7 +57,7 @@ public class JsonFixer {
 
     public OpenPos getOneItem(String symb)
     {
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         OpenPos holdOpenPos = new OpenPos();
         try {
 
@@ -79,7 +81,7 @@ public class JsonFixer {
     }
     public void read()
     {
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
 
         try {
             // Create an ObjectMapper instance
@@ -92,7 +94,7 @@ public class JsonFixer {
 
     public ArrayList<OpenPos> addToList() {
         boolean fileIsEmpty = false;
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         ArrayList<OpenPos> o = new ArrayList<OpenPos>();
 
 
@@ -118,7 +120,7 @@ public class JsonFixer {
 
     public void update(OpenPos openPos)
     {
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         try {
             // Create an ObjectMapper instance
             ObjectMapper objectMapper = new ObjectMapper();
@@ -149,7 +151,7 @@ public class JsonFixer {
     public void loadToView(TableView<OpenPos> tblOpenPos)
     {
         boolean fileIsEmpty = false;
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         if (isJsonFileEmpty(fileName)) {
             System.out.println("JSON file is empty.");
             fileIsEmpty = true;
@@ -186,26 +188,23 @@ public class JsonFixer {
         {
         int removeId= o.getId();
         int size = tblOpen.getItems().size();
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            List<OpenPos> openPosList = objectMapper.readValue(new File(fileName), new TypeReference<List<OpenPos>>() {
+            List<OpenPos> openPosInJson = objectMapper.readValue(new File(fileName), new TypeReference<List<OpenPos>>() {
             });
             List<OpenPos> updatedList = new ArrayList<>();
-            int index = 0;
             for (int i = 0; i < size; i++) {
-                if (openPosList.get(i).getId() == removeId) {
+                if (openPosInJson.get(i).getId() == removeId) {
                     // Add the item to the updated list if its symbol doesn't match the one to delete
                     System.out.println(o.getSymb() + " have been removed from the file");
-                    index = i;
                 } else {
-                    updatedList.add(openPosList.get(i));
+                    updatedList.add(openPosInJson.get(i));
                 }
             }
             objectMapper.writeValue(new File(fileName), updatedList);
-            tblOpen.getItems().remove(index);
+            tblOpen.getItems().remove(o);
             tblOpen.refresh();
-
             // Access other properties as needed
         } catch (IOException e) {
             e.printStackTrace();
@@ -215,7 +214,7 @@ public class JsonFixer {
     public void remove (OpenPos openPos)
     {
         int removeId= openPos.getId();
-        String fileName = "OpenPositions.json";
+        String fileName = file2;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             List<OpenPos> openPosList = objectMapper.readValue(new File(fileName), new TypeReference<List<OpenPos>>() {

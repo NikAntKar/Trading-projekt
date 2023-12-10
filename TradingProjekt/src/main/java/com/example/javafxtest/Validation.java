@@ -11,7 +11,7 @@ public class Validation {
 
     }
 
-    public boolean CheckNumber(TextField input) {
+    public boolean CheckNumberTextfields(TextField input) {
 
         boolean test = true;
         String text = input.getText();
@@ -26,7 +26,20 @@ public class Validation {
         }
         return test;
     }
+    public boolean CheckNumberString(String text) {
 
+        boolean test = true;
+        if (!text.matches("\\d*\\.?\\d*")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText(null);
+            alert.setContentText("Please enter only numeric values.");
+            alert.showAndWait();
+            test = false;
+
+        }
+        return test;
+    }
     public boolean dateSelected (DatePicker datePicker)
     {
         boolean test = true;

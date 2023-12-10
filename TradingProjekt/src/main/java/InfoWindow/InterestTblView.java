@@ -2,14 +2,11 @@ package InfoWindow;
 import DataBase.DatabaseController;
 import com.example.javafxtest.ApiCall;
 import com.example.javafxtest.FormatterClass;
-import Analyse.Portfolio;
 import com.example.javafxtest.Validation;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 
 public class InterestTblView extends TableView<PotentialPos> {
@@ -74,43 +71,44 @@ public class InterestTblView extends TableView<PotentialPos> {
             TableColumn.CellEditEvent<PotentialPos, Double> event,
             TableView<PotentialPos> tblInterest, Label lblAdjR
     ) {
+
+        double newValue = event.getNewValue();
         FormatterClass f = new FormatterClass();
         TableColumn<PotentialPos, Double> editedColumn = eventColumn;
         PotentialPos item = event.getRowValue();
         String columnName = editedColumn.getText().toUpperCase();
-        double newValue = event.getNewValue();
-        if (columnName.equals("PRICE")) {
-            item.setPrice(newValue);
-        } else if (columnName.equals("STOP")) {
-            item.setStop(newValue);
-        } else if (columnName.equals("HOD")) {
-            item.setHod(newValue);
-        } else if (columnName.equals("LOD")) {
-            item.setLod(newValue);
-        } else if (!columnName.equals("PRICE") && !columnName.equals("STOP")) {
-            System.err.println("Can't figure out where this call comes from");
-        }
-        // Recalculate "risk" and "units" for the item
-        double price = item.getPrice();
-        double stop = item.getStop();
-        double side = item.getSide();
-        double risk;
-        if (side == 'B') {
-            risk = price - stop;
-        } else {
-            risk = stop - price;
-        }
-        double fRisk = f.formatDoubleXX(risk);
-        item.setRisk(fRisk);
-        String adjRString = lblAdjR.getText();
-        adjRString = adjRString.replace("%", "");
-        double adjR = Double.parseDouble(adjRString);
-        DatabaseController database = new DatabaseController();
-        double currentValue = database.getPortFolioCurrentValue();
-        double dolRisk = f.formatDoubleXX(adjR *currentValue)/100;
-        int units = (int) Math.floor(dolRisk / fRisk);
-        item.setUnits(units);
-        tblInterest.refresh();
+         if (columnName.equals("PRICE")) {
+                item.setPrice(newValue);
+            } else if (columnName.equals("STOP")) {
+                item.setStop(newValue);
+            } else if (columnName.equals("HOD")) {
+                item.setHod(newValue);
+            } else if (columnName.equals("LOD")) {
+                item.setLod(newValue);
+            } else if (!columnName.equals("PRICE") && !columnName.equals("STOP")) {
+                System.err.println("Can't figure out where this call comes from");
+            }
+            // Recalculate "risk" and "units" for the item
+            double price = item.getPrice();
+            double stop = item.getStop();
+            double side = item.getSide();
+            double risk;
+            if (side == 'B') {
+                risk = price - stop;
+            } else {
+                risk = stop - price;
+            }
+            double fRisk = f.formatDoubleXX(risk);
+            item.setRisk(fRisk);
+            String adjRString = lblAdjR.getText();
+            adjRString = adjRString.replace("%", "");
+            double adjR = Double.parseDouble(adjRString);
+            DatabaseController database = new DatabaseController();
+            double currentValue = database.getPortFolioCurrentValue();
+            double dolRisk = f.formatDoubleXX(adjR *currentValue)/100;
+            int units = (int) Math.floor(dolRisk / fRisk);
+            item.setUnits(units);
+            tblInterest.refresh();
     }
 
     public PotentialPos handleMoveToExecute(TableView<PotentialPos> tblInterest, TextField symbF, TextField priceF,
@@ -161,7 +159,7 @@ public class InterestTblView extends TableView<PotentialPos> {
                                  TextField stopField, TextField unitsField, Label lblNewRisk, ToggleButton tglBuy,
                                     Label lbl3RTarget, Label lblMaxUnits, Label lblMinUnits, Label lblExists )
     {
-        if(validate.CheckNumber(stopField) && validate.CheckNumber(priceField) && validate.CheckNumber(priceField))
+        if(validate.CheckNumberTextfields(stopField) && validate.CheckNumberTextfields(priceField) && validate.CheckNumberTextfields(priceField))
         {
             String tickerF = tickerField.getText().toUpperCase();
             String priceF = priceField.getText().toUpperCase();

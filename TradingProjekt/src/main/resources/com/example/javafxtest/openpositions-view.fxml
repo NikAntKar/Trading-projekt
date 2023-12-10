@@ -26,7 +26,7 @@
    <children>
 
       <Label fx:id="errTickerLbl" layoutX="187.0" layoutY="103.0" prefHeight="25.0" prefWidth="260.0" text="Label" textFill="#ee0909" visible="false" />
-      <TableView fx:id="tblOpen" layoutX="10.0" layoutY="435.0" onMouseClicked="#addToExecute" prefHeight="185.0" prefWidth="711.0" style="-fx-alignment: center;">
+      <TableView fx:id="tblOpen" layoutX="10.0" layoutY="435.0" onMouseClicked="#addToExecute" prefHeight="185.0" prefWidth="771.0" style="-fx-alignment: center;">
         <columns>
           <TableColumn fx:id="tblOpenSymb" prefWidth="50.0" style="-fx-alignment: center;" text="Ticker" />
           <TableColumn fx:id="tblOpenPrice" prefWidth="50.0" style="-fx-alignment: center;" text="Price" />
@@ -41,6 +41,7 @@
             <TableColumn fx:id="tblCurrentPrice" prefWidth="60.0" style="-fx-alignment: center;" text="Price now" />
             <TableColumn fx:id="tblClosePrice" prefWidth="60.0" style="-fx-alignment: center;" text="CloseP" />
             <TableColumn fx:id="tblOpenR" prefWidth="60.0" style="-fx-alignment: center;" text="Open R" />
+            <TableColumn fx:id="tblWorstCase" prefWidth="60.0" style="-fx-alignment: center;" text="WC" />
         </columns>
       </TableView>
       <Label contentDisplay="CENTER" layoutX="203.0" layoutY="30.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="27.0" prefWidth="70.0" text="Symbol" textAlignment="CENTER" AnchorPane.leftAnchor="206.0">
@@ -637,7 +638,7 @@
             </Button>
          </children>
       </HBox>
-      <VBox layoutX="754.0" layoutY="465.0" prefHeight="80.0" prefWidth="58.0" AnchorPane.rightAnchor="48.0">
+      <VBox layoutX="792.0" layoutY="465.0" prefHeight="80.0" prefWidth="58.0" AnchorPane.rightAnchor="10.0">
          <children>
             <Button fx:id="btnChangeTblOpenpos" minHeight="25.0" mnemonicParsing="false" onAction="#changeTblOpenPos" prefWidth="70.0" text="Change" />
             <Button fx:id="removeOpenPos" minHeight="25.0" mnemonicParsing="false" onAction="#removeFromTbl" prefWidth="70.0" text="Remove">

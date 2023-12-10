@@ -1,6 +1,5 @@
 package InfoWindow;
 
-import DataBase.MyJDBC;
 import com.example.javafxtest.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -32,7 +31,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 
 public class ActiveController implements Initializable {
 
@@ -149,6 +147,8 @@ public class ActiveController implements Initializable {
     private TableColumn<OpenPos, Double> tblOpen9R;
     @FXML
     private TableColumn<OpenPos, Double> tblOpenR;
+    @FXML
+    private TableColumn<OpenPos, Double> tblWorstCase;
     @FXML
     private TableColumn<OpenPos, Double> tblOpenPrice;
     @FXML
@@ -305,13 +305,14 @@ public class ActiveController implements Initializable {
 
     public void setUpOpenPositionsInfo()
     {
-        openPosTblView.setUpOpenPositions(tblOpen, lblWorstCase, lblOpenR);
+        openPosTblView.setUpOpenPosLabels(tblOpen, lblWorstCase, lblOpenR);
     }
 
     public void refreshTableOpenPos()
     {
         openPosTblView.refresh(tblOpen);
-        openPosTblView.setUpOpenPositions(tblOpen, lblWorstCase, lblOpenR);
+        tblOpen.getSortOrder().add(tblOpenSymb);
+        setUpOpenPositionsInfo();
     }
 
 
@@ -323,17 +324,21 @@ public class ActiveController implements Initializable {
     {
         JsonFixer json = new JsonFixer();
         json.remove(tblOpen);
+        tblOpen.refresh();
+        tblOpen.getSortOrder().add(tblOpenSymb);
+        setUpOpenPositionsInfo();
     }
     public void removePos()
     {
         interestTblView.handleRemovePos(tblInterest);
+        interestTblView.refresh();
     }
     public void openPosAdd()
     {
         System.out.println("Click on add");
-        boolean numbersTestPrice = validation.CheckNumber(priceField);
-        boolean numbersTestStop = validation.CheckNumber(stopField);
-        boolean numbersTestUnits = validation.CheckNumber(unitsField);
+        boolean numbersTestPrice = validation.CheckNumberTextfields(priceField);
+        boolean numbersTestStop = validation.CheckNumberTextfields(stopField);
+        boolean numbersTestUnits = validation.CheckNumberTextfields(unitsField);
         boolean dateSelected = validation.dateSelected(dateColumn);
         if(numbersTestStop && numbersTestPrice && numbersTestUnits && dateSelected) {
             String tickerF = tickerField.getText();
@@ -380,7 +385,7 @@ public class ActiveController implements Initializable {
             {
                 openPosTblView.HandleAddToOpenPos(tblOpen, openPosTblView.getOpenPos().get(foundAtOpenPosTbl), priceF,tickerF, stopF, unitsF, dateColumn, side);
             }
-            openPosTblView.setUpOpenPositions( tblOpen, lblWorstCase, lblOpenR);
+            setUpOpenPositionsInfo();
             tickerField.clear();
             priceField.clear();
             stopField.clear();
@@ -391,8 +396,8 @@ public class ActiveController implements Initializable {
             lblMaxUnits.setVisible(false);
             lblMinUnits.setVisible(false);
         }
-
-     }
+        tblOpen.getSortOrder().add(tblOpenSymb);
+    }
     public void interestToExecute()
     {
         tblInterest.setOnMouseClicked(event -> {
@@ -424,13 +429,15 @@ public class ActiveController implements Initializable {
     }
 
     public void executeSaveOP() throws IOException {
-        boolean numbersTestPrice = validation.CheckNumber(priceFieldOPos);
-        boolean numbersTestUnits = validation.CheckNumber(unitsFieldsOpenP);
+        boolean numbersTestPrice = validation.CheckNumberTextfields(priceFieldOPos);
+        boolean numbersTestUnits = validation.CheckNumberTextfields(unitsFieldsOpenP);
         if(numbersTestUnits && numbersTestPrice)
         {
         openPosTblView.SaveChanges(tblOpen, cbSymb, priceFieldOPos, unitsFieldsOpenP, dateColumnOPos,
                 lblSymbOp, lblUnitsOp, lblPriceOp, lblDateOp, tglBuyOP, tglSellOP, btnExecuteOP, this);
         }
+        tblOpen.getSortOrder().add(tblOpenSymb);
+        setUpOpenPositionsInfo();
     }
 
     public void updateTable()
@@ -475,9 +482,18 @@ public class ActiveController implements Initializable {
 
 
     private void handleEditInInterest(TableColumn.CellEditEvent<PotentialPos, Double> event) {
-        TableColumn<PotentialPos, Double> eventColumn = event.getTableColumn();
-        InterestTblView i = new InterestTblView();
-        i.handleEditInView(eventColumn, event, tblInterest, lblAdjr);
+        if(validation.CheckNumberString(String.valueOf(event.getNewValue())))
+        {
+            TableColumn<PotentialPos, Double> eventColumn = event.getTableColumn();
+            InterestTblView i = new InterestTblView();
+            i.handleEditInView(eventColumn, event, tblInterest, lblAdjr);
+        }
+    }
+    public void handleEditInOpenPos(TableColumn.CellEditEvent<OpenPos, Double> event)
+    {
+        TableColumn<OpenPos, Double> eventColumn = event.getTableColumn();
+        openPosTblView.handleEditStop(eventColumn, event, tblOpen);
+        setUpOpenPositionsInfo();
     }
 
     private void focusListenerLogic() {
@@ -499,6 +515,8 @@ public class ActiveController implements Initializable {
         }
         json.loadToView(tblOpen);
         tblOpen.refresh();
+        tblOpen.getSortOrder().add(tblOpenSymb);
+
     }
     ObservableList<OpenPos> tblOpen (){
         return FXCollections.observableArrayList();
@@ -594,7 +612,6 @@ public class ActiveController implements Initializable {
         tblInterestHod.setOnEditCommit(this::handleEditInInterest);
         tblInterestHod.setOnEditCommit(this::handleEditInInterest);
         tblInterestLod.setOnEditCommit(this::handleEditInInterest);
-
         tblInterest.setItems(interestList());
         tblInterest.setEditable(true);
 
@@ -609,6 +626,12 @@ public class ActiveController implements Initializable {
         tblOpenPrice.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("openPrice"));
         tblOpenUnits.setCellValueFactory(new PropertyValueFactory<OpenPos, Integer>("startUnits"));
         tblOpenStop.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("stop"));
+        tblOpenStop.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        tblOpenStop.setOnEditCommit(event -> {
+            OpenPos item = event.getTableView().getItems().get(event.getTablePosition().getRow());
+            item.setStop(event.getNewValue());
+        });
+        tblOpenStop.setOnEditCommit(this::handleEditInOpenPos);
         tblOpenULeft.setCellValueFactory(new PropertyValueFactory<OpenPos, Integer>("unitsLeft"));
         tblOpenThird.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("thirdSell"));
         tblOpen3Atr.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("atrTarget"));
@@ -618,6 +641,7 @@ public class ActiveController implements Initializable {
         tblCurrentPrice.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("currentPrice"));
         tblClosePrice.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("closePrice"));
         tblOpenR.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("openR"));
+        tblWorstCase.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("worstCase"));
         tblOpen.setItems(tblOpen());
         tblOpen.setEditable(true);
 
@@ -672,6 +696,7 @@ public class ActiveController implements Initializable {
         updateTable();
         setUpOpenPositionsInfo();
         setUpRiskInfo();
+        tblOpen.getSortOrder().add(tblOpenSymb);
 
     }
 

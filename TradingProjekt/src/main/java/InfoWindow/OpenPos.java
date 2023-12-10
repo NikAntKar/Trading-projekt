@@ -50,7 +50,6 @@ public class OpenPos {
         FormatterClass f = new FormatterClass();
         LocalDate localDate = datePicker.getValue();
         String formattedDate = localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
         this.id = id;
         this.symb = ticker;
         this.lod = lod;
@@ -61,6 +60,7 @@ public class OpenPos {
         this.thirdSell = units/3;
         this.openPrice = price;
         this.startUnits = units;
+        this.worstCase = takenR;
         stops.add(stop);
         this.stop = stop;
         this.currentPrice = price;
@@ -74,7 +74,7 @@ public class OpenPos {
         this.calcAdjR = adjR;
         this.atr = atr;
         this.currentR = oneR;
-        openR = f.formatDoubleXX((risk*units)/ oneR);
+        openR = 0;
         if(side == 'B') {
             this.side = 'B';
             threR = f.formatDoubleXX(price + (risk*3));
@@ -99,6 +99,7 @@ public class OpenPos {
     int id;
     String symb;
     double range;
+    double worstCase;
     double atr;
     double risk;
     double currentR;
@@ -125,15 +126,17 @@ public class OpenPos {
 
     public void removeTransaction(int index)
     {
-        System.out.println("sides 1 " +sides);
         sides.remove(index);
         units.remove(index);
         price.remove(index);
         date.remove(index);
-        System.out.println("sides 2 " +sides);
     }
 
     // Setters
+
+    public void setWorstCase(double worstCase) {
+        this.worstCase = worstCase;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -263,6 +266,10 @@ public class OpenPos {
 
     //Getters
 
+
+    public double getWorstCase() {
+        return worstCase;
+    }
 
     public ArrayList<Double> getStops() {
         return stops;

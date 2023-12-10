@@ -226,12 +226,6 @@ public class RiskCalculator {
                 roundedIwmValue --;
             }
         }
-        System.out.println("spy " +roundedSpyValue);
-        System.out.println("qqq " +roundedQqqValue);
-        System.out.println("iwm " +roundedIwmValue);
-        lblQQQ.setText(String.valueOf(QQQdist)+" ATR");
-        lblSPY.setText(String.valueOf(SPYdist) +" ATR");
-        lblIWM.setText(String.valueOf(IWMdist) + " ATR");
     }
     public void setUpDrawDownScore(Label lblDrawdown)
     {
@@ -267,8 +261,6 @@ public class RiskCalculator {
         double currentValue = database.getPortFolioCurrentValue();
         double tenMa = database.getMa10();
         double twentyMa = database.getMa20();
-        System.out.println(tenMa);
-        System.out.println(currentValue);
         if(!(tenMa == 0))
         {
             if( currentValue > tenMa)

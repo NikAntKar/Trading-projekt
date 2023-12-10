@@ -71,6 +71,8 @@ public class ApiCall {
     String sym = "";
     String apiKey1 = "ae5fac5be266486dbe36ae33f5276850";
     String apiKey2 = "a3e5ed854b7e4f5985120c4f02889099";
+    String apiKey3 ="5f6b8dcb1fbb4d8283e3cb0f6ab5c023";
+    String apiKey4 = "2c45d681aef449829b666073ce8f7e90";
 
     public void setInsideDayPrior(boolean insideDayPrior) {
         this.insideDayPrior = insideDayPrior;
@@ -127,11 +129,21 @@ public class ApiCall {
             String urlen = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey=" + apiKey1;
             JSONObject jsonObject = connectionObject(urlen);
             String priceString = (String) jsonObject.get("price");
-                if(Objects.isNull(priceString)) {
-                    urlen = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey="+ apiKey2;
-                    jsonObject = connectionObject(urlen);
-                    priceString = (String) jsonObject.get("price");
-                }
+            if(Objects.isNull(priceString)) {
+                urlen = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey="+ apiKey2;
+                jsonObject = connectionObject(urlen);
+                priceString = (String) jsonObject.get("price");
+            }
+            if(Objects.isNull(priceString)) {
+                urlen = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey="+ apiKey3;
+                jsonObject = connectionObject(urlen);
+                priceString = (String) jsonObject.get("price");
+            }
+            if(Objects.isNull(priceString)) {
+                urlen = "https://api.twelvedata.com/price?symbol=" + ticker + "&apikey="+ apiKey4;
+                jsonObject = connectionObject(urlen);
+                priceString = (String) jsonObject.get("price");
+            }
             price = Double.parseDouble(priceString.toString());
         }
         catch(Exception e){
@@ -139,6 +151,7 @@ public class ApiCall {
         }
         return price;
     }
+
 
     //Try with thread and async
 //    public class ThreadGetCurrentPrice extends Thread
@@ -180,46 +193,8 @@ public class ApiCall {
 //        }
 //    }
 
-        public double Get5MinAdr(String ticker, int period)  {
-            double adr= 0;
-            int times = 0;
-            String tid = getNewYorkTime(period);
-            try {
-                String urlen = "https://api.twelvedata.com/time_series?&symbol=" + ticker + "&interval=5min&&start_date="+tid+"&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                String responsecontent = EntityUtils.toString(entity);
-                JSONParser parser = new JSONParser();
-                JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                JSONArray dataArray = (JSONArray) jsonObject.get("values");
-                if (!dataArray.isEmpty()) {
-                    for (Object item : dataArray) {
-                    JSONObject jsonItem = (JSONObject) item;
-                    String lowString = (String) jsonItem.get("low");
-                    String highString = (String) jsonItem.get("high");
-                    double doubleLow = Double.parseDouble(lowString);
-                    double doubleHigh = Double.parseDouble(highString);
-                    adr = adr + (doubleHigh - doubleLow);
-                    times ++;
-                }}
-                else
-                    System.out.println("JsonArray is empty in Get5MinAdr method");
-            }
 
-            catch(Exception e){
-                System.out.println(e);
-            }
-            adr = adr /times;
-            DecimalFormat df = new DecimalFormat("0.00");
-            String formattValueStr = df.format(adr);
-            double formatAdr = Double.parseDouble(formattValueStr);
-
-            return formatAdr;
-
-        }
-        public double GetOpen(String ticker){
+    public double GetOpen(String ticker){
             double open =0;
             try {
                 String urlen = "https://api.twelvedata.com/quote?symbol=" + ticker + "&apikey=" + apiKey1;
@@ -289,7 +264,49 @@ public class ApiCall {
         return jsonObject;
     }
 
-        public double GetMa10(String ticker, String date){
+    public double GetMa10(String ticker, String date){
+        double Ma = 0;
+        String startDate = date;
+        String endDate = date;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parseDate = LocalDate.parse(endDate, formatter);
+        LocalDate nextDay = parseDate.plusDays(1);
+        endDate = nextDay.format(formatter);
+
+        try {
+            String urlen = "https://api.twelvedata.com/ma?symbol=" + ticker + "&interval=1day&time_period=10&start_date="+startDate+"&apikey=" + apiKey1;
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(urlen);
+            HttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() == 200) {
+                String responsecontent = EntityUtils.toString(entity);
+                JSONParser parser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
+                // Get the first "values" entry
+                JSONArray dataArray = (JSONArray) jsonObject.get("values");
+                if (!dataArray.isEmpty()) {
+                    if (!dataArray.isEmpty()) {
+                        JSONObject firstEntry = (JSONObject) dataArray.get(0);
+                        String ma = (String) firstEntry.get("ma");
+                        Ma = Double.parseDouble(ma);
+                    }
+                    else
+                        System.out.println("JsonArray is empty in GetMa10 method");
+                }
+                    else {
+                    System.err.println("No data in the 'values' array.");
+                }
+            } else {
+                System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
+            }
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return Ma;
+    }
+    public double GetMa20(String ticker, String date ){
             double Ma = 0;
             String startDate = date;
             String endDate = date;
@@ -297,201 +314,224 @@ public class ApiCall {
             LocalDate parseDate = LocalDate.parse(endDate, formatter);
             LocalDate nextDay = parseDate.plusDays(1);
             endDate = nextDay.format(formatter);
-
-            try {
-                String urlen = "https://api.twelvedata.com/ma?symbol=" + ticker + "&interval=1day&time_period=10&start_date="+startDate+"&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    String responsecontent = EntityUtils.toString(entity);
-                    JSONParser parser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                    // Get the first "values" entry
-                    JSONArray dataArray = (JSONArray) jsonObject.get("values");
+        try {
+            String urlen = "https://api.twelvedata.com/ma?symbol=" + ticker + "&interval=1day&time_period=20&apikey=" + apiKey1;
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(urlen);
+            HttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            if (response.getStatusLine().getStatusCode() == 200) {
+                String responsecontent = EntityUtils.toString(entity);
+                JSONParser parser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
+                // Get the first "values" entry
+                JSONArray dataArray = (JSONArray) jsonObject.get("values");
+                if (!dataArray.isEmpty()) {
                     if (!dataArray.isEmpty()) {
-                        if (!dataArray.isEmpty()) {
-                            JSONObject firstEntry = (JSONObject) dataArray.get(0);
-                            String ma = (String) firstEntry.get("ma");
-                            Ma = Double.parseDouble(ma);
-                        }
-                        else
-                            System.out.println("JsonArray is empty in GetMa10 method");
+                        JSONObject firstEntry = (JSONObject) dataArray.get(0);
+                        String ma = (String) firstEntry.get("ma");
+                        Ma = Double.parseDouble(ma);
                     }
-                        else {
-                        System.err.println("No data in the 'values' array.");
-                    }
+                    else
+                        System.out.println("JsonArray is empty in GetMa20 method");
+
+
                 } else {
-                    System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
+                    System.err.println("No data in the 'values' array.");
                 }
+            } else {
+                System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
             }
-            catch(Exception e){
-                System.out.println(e);
-            }
-            return Ma;
         }
-        public double GetMa20(String ticker, String date ){
-                double Ma = 0;
-                String startDate = date;
-                String endDate = date;
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate parseDate = LocalDate.parse(endDate, formatter);
-                LocalDate nextDay = parseDate.plusDays(1);
-                endDate = nextDay.format(formatter);
-            try {
-                String urlen = "https://api.twelvedata.com/ma?symbol=" + ticker + "&interval=1day&time_period=20&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    String responsecontent = EntityUtils.toString(entity);
-                    JSONParser parser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                    // Get the first "values" entry
-                    JSONArray dataArray = (JSONArray) jsonObject.get("values");
-                    if (!dataArray.isEmpty()) {
-                        if (!dataArray.isEmpty()) {
-                            JSONObject firstEntry = (JSONObject) dataArray.get(0);
-                            String ma = (String) firstEntry.get("ma");
-                            Ma = Double.parseDouble(ma);
-                        }
-                        else
-                            System.out.println("JsonArray is empty in GetMa20 method");
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return Ma;
+    }
 
 
-                    } else {
-                        System.err.println("No data in the 'values' array.");
-                    }
-                } else {
-                    System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
+    public double GetAvgDolVol(String ticker, String date){
+        double avgDolVol =0;
+        //LocalDate today  = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parseDate = LocalDate.parse(date, formatter);
+        LocalDate currentDate = parseDate.minusDays(1);
+        LocalDate startDate =  calculateWorkingDaysInPast(parseDate, 10);
+        int times = 0;
+        double sumVol =0;
+        try {
+            String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&end_date="+currentDate+"&start_date="+startDate+"&interval=1day&&apikey=" + apiKey1;
+            JSONObject jsonObject = connectionObject(urlen);
+            JSONArray dataArray = (JSONArray) jsonObject.get("values");
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&end_date="+currentDate+"&start_date="+startDate+"&interval=1day&&apikey=" + apiKey2;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&end_date="+currentDate+"&start_date="+startDate+"&interval=1day&&apikey=" + apiKey3;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&end_date="+currentDate+"&start_date="+startDate+"&interval=1day&&apikey=" + apiKey4;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+                if (!dataArray.isEmpty()) {
+                for (Object item : dataArray) {
+                    JSONObject jsonItem = (JSONObject) item;
+                    String close = (String) jsonItem.get("close");
+                    String volume = (String) jsonItem.get("volume");
+                    double doubleClose = Double.parseDouble(close);
+                    double doublevolume = Double.parseDouble(volume);
+                    sumVol =sumVol+ (doubleClose * doublevolume);
+                    times ++;
                 }
-            }
-            catch(Exception e){
-                System.out.println(e);
-            }
-            return Ma;
+
+                }
+                else
+                    System.out.println("JsonArray is empty in GetAvgDolVol method");
+
+                avgDolVol = (sumVol/times)/1000000;
+                DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                String formattedAvgDolVolString = decimalFormat.format(avgDolVol);
+                avgDolVol = Double.parseDouble(formattedAvgDolVolString);
         }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return avgDolVol;
+    }
 
-
-        public double GetAvgDolVol(String ticker, String date){
-            double avgDolVol =0;
-            //LocalDate today  = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate parseDate = LocalDate.parse(date, formatter);
-            LocalDate currentDate = parseDate.minusDays(1);
-            LocalDate startDate =  calculateWorkingDaysInPast(parseDate, 10);
-            int times = 0;
-            double sumVol =0;
-            try {
-                String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&end_date="+currentDate+"&start_date="+startDate+"&interval=1day&&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                HttpEntity entity = response.getEntity();
-                if ( response.getStatusLine().getStatusCode() ==200)
+    public void setYDActions(String ticker, String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parseDate = LocalDate.parse(date, formatter);
+        LocalDate daysBack =  calculateWorkingDaysInPast(parseDate, 1);
+        LocalDate endDate = parseDate.plusDays(1);
+        double firstHod =0;
+        double firstLod = 0;
+        double secondHod =0;
+        double secondLod = 0;
+        try {
+            String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + daysBack + "&end_date=" + endDate+"&interval=1day&&apikey=" + apiKey1;
+            JSONObject jsonObject = connectionObject(urlen);
+            JSONArray dataArray = (JSONArray) jsonObject.get("values");
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + daysBack + "&end_date=" + endDate+"&interval=1day&&apikey=" + apiKey2;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + daysBack + "&end_date=" + endDate+"&interval=1day&&apikey=" + apiKey3;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }    if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + daysBack + "&end_date=" + endDate+"&interval=1day&&apikey=" + apiKey4;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+            if (!dataArray.isEmpty()) {
+                int index  =0;
+            for (Object item : dataArray) {
+                JSONObject jsonItem = (JSONObject) item;
+                String lowString = (String) jsonItem.get("low");
+                String highString = (String) jsonItem.get("high");
+                String closeString = (String) jsonItem.get("close");
+                double doubleClose = Double.parseDouble(closeString);
+                double doubleLow = Double.parseDouble(lowString);
+                double doubleHigh = Double.parseDouble(highString);
+                if(index==0)
                 {
-                    String responsecontent = EntityUtils.toString(entity);
-                    JSONParser parser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                    JSONArray dataArray = (JSONArray) jsonObject.get("values");
-                    if (!dataArray.isEmpty()) {
-                    for (Object item : dataArray) {
-                        JSONObject jsonItem = (JSONObject) item;
-                        String close = (String) jsonItem.get("close");
-                        String volume = (String) jsonItem.get("volume");
-                        double doubleClose = Double.parseDouble(close);
-                        double doublevolume = Double.parseDouble(volume);
-                        sumVol =sumVol+ (doubleClose * doublevolume);
-                        times ++;
-                    }
-
-                    }
-                    else
-                        System.out.println("JsonArray is empty in GetAvgDolVol method");
-
-                    avgDolVol = (sumVol/times)/1000000;
-                    DecimalFormat decimalFormat = new DecimalFormat("#.##");
-                    String formattedAvgDolVolString = decimalFormat.format(avgDolVol);
-                    avgDolVol = Double.parseDouble(formattedAvgDolVolString);
-                } else {
-                    System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
+                    setLod(doubleLow);
+                    setHod(doubleHigh);
                 }
+                if(index == 1)
+                {
+                    secondHod = doubleHigh;
+                    secondLod = doubleLow;
+                }
+                if(index == 2)
+                {
+                    firstHod = doubleHigh;
+                    firstLod = doubleLow;
+                }
+                index++;
             }
-            catch(Exception e){
-                System.out.println(e);
+            if(firstHod>secondHod && firstLod<secondLod)
+            {
+                setInsideDayPrior(true);
             }
-            return avgDolVol;
+            else{
+                setInsideDayPrior(false);
+            }
+            FormatterClass f = new FormatterClass();
+            setYdRange(f.formatDoubleXXXX(secondHod-secondLod));
+            }
+            else
+                System.out.println("JsonArray is empty in setYDActions method");
+            }
+         catch(Exception e){
+            System.out.println(e);
         }
-
-        public void setYDActions(String ticker, String date) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate parseDate = LocalDate.parse(date, formatter);
-            LocalDate daysBack =  calculateWorkingDaysInPast(parseDate, 1);
-            LocalDate endDate = parseDate.plusDays(1);
-            double firstHod =0;
-            double firstLod = 0;
-            double secondHod =0;
-            double secondLod = 0;
-            try {
-                String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + daysBack + "&end_date=" + endDate+"&interval=1day&&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    HttpEntity entity = response.getEntity();
-                    String responsecontent = EntityUtils.toString(entity);
-                    JSONParser parser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                    JSONArray dataArray = (JSONArray) jsonObject.get("values");
-                    if (!dataArray.isEmpty()) {
-
-                        int index  =0;
-                    for (Object item : dataArray) {
-                        JSONObject jsonItem = (JSONObject) item;
-                        String lowString = (String) jsonItem.get("low");
-                        String highString = (String) jsonItem.get("high");
-                        String closeString = (String) jsonItem.get("close");
-                        double doubleClose = Double.parseDouble(closeString);
-                        double doubleLow = Double.parseDouble(lowString);
-                        double doubleHigh = Double.parseDouble(highString);
-                        if(index==0)
-                        {
-                            setLod(doubleLow);
-                            setHod(doubleHigh);
-                        }
-                        if(index == 1)
-                        {
-                            secondHod = doubleHigh;
-                            secondLod = doubleLow;
-                        }
-                        if(index == 2)
-                        {
-                            firstHod = doubleHigh;
-                            firstLod = doubleLow;
-                        }
-                        index++;
-                    }
-                    if(firstHod>secondHod && firstLod<secondLod)
-                    {
-                        setInsideDayPrior(true);
-                    }
-                    else{
-                        setInsideDayPrior(false);
-                    }
-                    FormatterClass f = new FormatterClass();
-                    setYdRange(f.formatDoubleXXXX(secondHod-secondLod));
-                }
-                    else
-                        System.out.println("JsonArray is empty in setYDActions method");
+    }
+    public double Get5MinAdr(String ticker, int period)  {
+        double adr= 0;
+        int times = 0;
+        String tid = getNewYorkTime(period);
+        try {
+            String urlen = "https://api.twelvedata.com/time_series?&symbol=" + ticker + "&interval=5min&&start_date="+tid+"&apikey=" + apiKey1;
+            JSONObject jsonObject = connectionObject(urlen);
+            JSONArray dataArray = (JSONArray) jsonObject.get("values");
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?&symbol=" + ticker + "&interval=5min&&start_date="+tid+"&apikey=" + apiKey2;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
             }
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?&symbol=" + ticker + "&interval=5min&&start_date="+tid+"&apikey=" + apiKey3;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
             }
-                 catch(Exception e){
-                    System.out.println(e);
+            if(dataArray==null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?&symbol=" + ticker + "&interval=5min&&start_date="+tid+"&apikey=" + apiKey4;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
 
-                }
-            }
+            if (!dataArray.isEmpty()) {
+                for (Object item : dataArray) {
+                    JSONObject jsonItem = (JSONObject) item;
+                    String lowString = (String) jsonItem.get("low");
+                    String highString = (String) jsonItem.get("high");
+                    double doubleLow = Double.parseDouble(lowString);
+                    double doubleHigh = Double.parseDouble(highString);
+                    adr = adr + (doubleHigh - doubleLow);
+                    times ++;
+                }}
+            else
+                System.out.println("JsonArray is empty in Get5MinAdr method");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        adr = adr /times;
+        DecimalFormat df = new DecimalFormat("0.00");
+        String formattValueStr = df.format(adr);
+        double formatAdr = Double.parseDouble(formattValueStr);
+
+        return formatAdr;
+
+    }
     public double getHistoricalPerformance(String ticker, String startDate, String endDate)
     {
         LocalDate parseStartDate = LocalDate.parse(startDate);
@@ -506,6 +546,18 @@ public class ApiCall {
         if(dataArray==null)
         {
             urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + parseStartDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey2;
+            jsonObject = connectionObject(urlen);
+            dataArray = (JSONArray) jsonObject.get("values");
+        }
+        if(dataArray==null)
+        {
+            urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + parseStartDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey3;
+            jsonObject = connectionObject(urlen);
+            dataArray = (JSONArray) jsonObject.get("values");
+        }
+        if(dataArray==null)
+        {
+            urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + parseStartDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey4;
             jsonObject = connectionObject(urlen);
             dataArray = (JSONArray) jsonObject.get("values");
         }
@@ -552,6 +604,18 @@ public class ApiCall {
             if(dataArray==null)
         {
             urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey2;
+            jsonObject = connectionObject(urlen);
+            dataArray = (JSONArray) jsonObject.get("values");
+        }
+        if(dataArray==null)
+        {
+            urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey3;
+            jsonObject = connectionObject(urlen);
+            dataArray = (JSONArray) jsonObject.get("values");
+        }
+        if(dataArray==null)
+        {
+            urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&end_date=" + parseEndDate + "&interval=1day&&apikey=" +apiKey4;
             jsonObject = connectionObject(urlen);
             dataArray = (JSONArray) jsonObject.get("values");
         }
@@ -604,87 +668,92 @@ public class ApiCall {
         setAtr(atr);
     }
 
-
-
     public void GetSetAdrAtrHodLod(String ticker){
-            double adr = 0;
-            double times =0;
-            double atr = 0;
-            LocalDate today  = LocalDate.now();
-            LocalDate startDate =  calculateWorkingDaysInPast(today, 18);
-        try {
-                String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&interval=1day&apikey=" + apiKey1;
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet(urlen);
-                HttpResponse response = httpClient.execute(httpGet);
-                if ( response.getStatusLine().getStatusCode() ==200)
-                {   HttpEntity entity = response.getEntity();
-                    String responsecontent = EntityUtils.toString(entity);
-                    JSONParser parser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) parser.parse(responsecontent);
-                    JSONArray dataArray = (JSONArray) jsonObject.get("values");
-                    if (!dataArray.isEmpty()) {
+    double adr = 0;
+    double times =0;
+    double atr = 0;
+    LocalDate today  = LocalDate.now();
+    LocalDate startDate =  calculateWorkingDaysInPast(today, 18);
+    try {
+        String urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&interval=1day&apikey=" + apiKey1;
+        JSONObject jsonObject = connectionObject(urlen);
+        JSONArray dataArray = (JSONArray) jsonObject.get("values");
+        if(dataArray == null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&interval=1day&apikey=" + apiKey2;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+        if(dataArray == null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&interval=1day&apikey=" + apiKey3;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+        if(dataArray == null)
+            {
+                urlen = "https://api.twelvedata.com/time_series?symbol=" + ticker + "&start_date=" + startDate + "&interval=1day&apikey=" + apiKey4;
+                jsonObject = connectionObject(urlen);
+                dataArray = (JSONArray) jsonObject.get("values");
+            }
+            if (!dataArray.isEmpty()) {
 
-                        ArrayList<Double> closes = new ArrayList<Double>();
-                        ArrayList<Double> highs = new ArrayList<Double>();
-                        ArrayList<Double> lows = new ArrayList<Double>();
-                        ArrayList<Double> maxValue = new ArrayList<Double>();
-                        int i = 0;
-                        int k = 0;
-                        for (Object item : dataArray) {
-                            JSONObject jsonItem = (JSONObject) item;
-                            String lowString = (String) jsonItem.get("low");
-                            String highString = (String) jsonItem.get("high");
-                            String closeString = (String) jsonItem.get("close");
-                            double doubleClose = Double.parseDouble(closeString);
-                            double doubleLow = Double.parseDouble(lowString);
-                            double doubleHigh = Double.parseDouble(highString);
-                            if (i > 4) {
-                                highs.add(doubleHigh);
-                                lows.add(doubleLow);
-                            }
-                            if (i > 5) {
-                                closes.add(doubleClose);
-                                maxValue.add(calcAtr(closes.get(k), highs.get(k), lows.get(k)));
-                                k++;
-                            }
-                            if (i != 0) {
-                                adr = adr + (doubleHigh / doubleLow);
-                                times++;
-                            } else {
-                                setLod(doubleLow);
-                                setHod(doubleHigh);
-                            }
-                            i++;
-
-                        }
-                        double sumRange = 0;
-                        for (int l = 0; l < maxValue.size(); l++) {
-                            sumRange += maxValue.get(l);
-                        }
-                        atr = sumRange / maxValue.size();
-                        for (int f = 0; f < maxValue.size(); f++) {
-                            double currentTrueRange = maxValue.get(f);
-                            atr = ((atr * (maxValue.size() - 1)) + currentTrueRange) / maxValue.size();
-                        }
-
-                        adr = (adr / times - 1) * 100;
-                        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-                        String formattedAvgDolVolString = decimalFormat.format(adr);
-                        adr = Double.parseDouble(formattedAvgDolVolString);
+                ArrayList<Double> closes = new ArrayList<Double>();
+                ArrayList<Double> highs = new ArrayList<Double>();
+                ArrayList<Double> lows = new ArrayList<Double>();
+                ArrayList<Double> maxValue = new ArrayList<Double>();
+                int i = 0;
+                int k = 0;
+                for (Object item : dataArray) {
+                    JSONObject jsonItem = (JSONObject) item;
+                    String lowString = (String) jsonItem.get("low");
+                    String highString = (String) jsonItem.get("high");
+                    String closeString = (String) jsonItem.get("close");
+                    double doubleClose = Double.parseDouble(closeString);
+                    double doubleLow = Double.parseDouble(lowString);
+                    double doubleHigh = Double.parseDouble(highString);
+                    if (i > 4) {
+                        highs.add(doubleHigh);
+                        lows.add(doubleLow);
                     }
-                    else
-                        System.out.println("JsonArray is empty in GetSetAdrAtrHodLod method");
+                    if (i > 5) {
+                        closes.add(doubleClose);
+                        maxValue.add(calcAtr(closes.get(k), highs.get(k), lows.get(k)));
+                        k++;
+                    }
+                    if (i != 0) {
+                        adr = adr + (doubleHigh / doubleLow);
+                        times++;
+                    } else {
+                        setLod(doubleLow);
+                        setHod(doubleHigh);
+                    }
+                    i++;
 
-                } else {
-                    System.err.println("API call failed with status code: " + response.getStatusLine().getStatusCode());
                 }
+                double sumRange = 0;
+                for (int l = 0; l < maxValue.size(); l++) {
+                    sumRange += maxValue.get(l);
+                }
+                atr = sumRange / maxValue.size();
+                for (int f = 0; f < maxValue.size(); f++) {
+                    double currentTrueRange = maxValue.get(f);
+                    atr = ((atr * (maxValue.size() - 1)) + currentTrueRange) / maxValue.size();
+                }
+
+                adr = (adr / times - 1) * 100;
+                DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                String formattedAvgDolVolString = decimalFormat.format(adr);
+                adr = Double.parseDouble(formattedAvgDolVolString);
+            }
+            else
+                System.out.println("JsonArray is empty in GetSetAdrAtrHodLod method");
             }
             catch(Exception e){
                 System.out.println(e);
             }
-            setAdr(adr);
-            setAtr(atr);
+        setAdr(adr);
+        setAtr(atr);
         }
         public double calcAtr(double close, double high, double low)
         {

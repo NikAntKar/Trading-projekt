@@ -22,8 +22,6 @@ public class InDepthStatsController {
     public InDepthStatsController(){
 
     }
-
-    Validation validation = new Validation();
     FormatterClass f = new FormatterClass();
     DatabaseController database = new DatabaseController();
     public void setUpSymbolsTableView(TableView<Stats> tbl)
@@ -190,7 +188,6 @@ public class InDepthStatsController {
             openDate = openDate.plusDays(1); // Move to the next day
         }
         lblTimeHeld.setText(String.valueOf(holdDays));
-        //double RMade =  stats.getResultR()/stats.getRisk();
         double bestClosePrice = 0;
         for(Trades item: trades)
         {

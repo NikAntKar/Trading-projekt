@@ -141,8 +141,6 @@ public class OpenPosTblView extends TableView<OpenPos> {
         double currentR = f.formatDouble(currentValue *0.01);
         double takenR = f.formatDoubleXX(totalRisk/currentR);
         int index = tblOpenPos.getItems().size()+1;
-        System.out.println(index + " index");
-        System.out.println(tblOpenPos.getItems().size() + " size");
         OpenPos o = new OpenPos(index, tickerF.toUpperCase(), priceP, unitsI, lod, risk,totalRisk,
                 hod, stopP, side, adr, rangeVAtr,  atr, datePickere, currentR, takenR, adjR);
         openPos.add(o);
@@ -206,7 +204,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
             jsonFixer.loadToView(tblOpenPos);
 
         } catch (NumberFormatException e) {
-            System.err.println("Invalid input: " + priceF + ". or: " + " tickerF" + ". or: "  +"tickerF");
+            System.err.println("Invalid input: " + priceF);
         }
     }
 
@@ -285,42 +283,90 @@ public class OpenPosTblView extends TableView<OpenPos> {
         }
 
     }
-    public void setUpOpenPositions(TableView<OpenPos> openPostbl, Label lblWorstCase, Label lblOpenR)
+    public void setUpOpenPosLabels(TableView<OpenPos> openPostbl, Label lblWorstCase, Label lblOpenR)
     {
-        DatabaseController database = new DatabaseController();
-        double currentValue = database.getPortFolioCurrentValue();
-        double oneR = currentValue * 0.01;
         double sumOpenR =0;
-        for(OpenPos o: openPos)
-        {
-            sumOpenR += o.getOpenR();
-        }
-        lblOpenR.setText(f.formatDoubleXX(sumOpenR) + "R");
-        double totalRisk =0;
+        double worstCase =0;
         for(OpenPos items: openPostbl.getItems())
         {
-            if(items.getSide() =='B')
-                totalRisk += ((items.getCurrentPrice() - items.getStop()) * items.getUnitsLeft());
-            else
-                totalRisk += ((items.getStop() - items.getCurrentPrice()) * items.getUnitsLeft());
+            sumOpenR += items.getOpenR();
+            worstCase += items.worstCase;
         }
-        double rWorstCase = f.formatDoubleXX(totalRisk /oneR);
-        lblWorstCase.setText(rWorstCase +"R");
+        worstCase = f.formatDoubleXX(worstCase);
+        sumOpenR = f.formatDoubleXX(sumOpenR);
+        lblOpenR.setText(f.formatDoubleXX(sumOpenR) + "R");
+        lblWorstCase.setText(worstCase +"R");
     }
 
+    // work in progress
+    public void handleEditStop(
+            TableColumn<OpenPos, Double> eventColumn,
+            TableColumn.CellEditEvent<OpenPos, Double> event,
+            TableView <OpenPos> tblOpenPos
+    )
+    {
+        OpenPos o = null;
+        OpenPos item = event.getRowValue();
+        String symb = item.getSymb();
+        for (OpenPos openPos : openPos) {
+            if (openPos.getSymb().equals(symb)) {
+                o = openPos;
+                break;
+            }
+        }
+        double newStop = event.getNewValue();
+        item.setStop(newStop);
+        o.setStop(newStop);
+        double worstCase = f.formatDoubleXX(handleWorstCase(o));
+        o.setWorstCase(worstCase);
+        item.setWorstCase(worstCase);
+        JsonFixer json = new JsonFixer();
+        json.update(o);
+        tblOpenPos.refresh();
+    }
+    public double handleOpenR(OpenPos o)
+    {
+        return 0;
+    }
+    public double handleWorstCase(OpenPos o)
+    {
+        Portfolio p = new Portfolio();
+        double currentOneR = p.getOneR();
+        double currentRisk;
+        if(o.getSide() =='B')
+            currentRisk = (o.getCurrentPrice()-o.getStop()) * o.getUnitsLeft();
+        else
+            currentRisk= (o.getStop()-o.getCurrentPrice()) * o.getUnitsLeft();
+        return currentRisk/currentOneR;
+    }
     public void refresh(TableView<OpenPos> tblOpenPos)
     {
         ApiCall apiCall = new ApiCall();
         JsonFixer json = new JsonFixer();
         Portfolio p = new Portfolio();
         double currentPrice;
+        String symb;
         int size = tblOpenPos.getItems().size();
+        double openR = 0;
         for(int i = 0; i< size;i++)
         {
-            OpenPos o = openPos.get(i);
-            currentPrice = apiCall.GetCurrentPrice(tblOpenPos.getItems().get(i).getSymb());
+            OpenPos o = null;
+            symb = tblOpenPos.getItems().get(i).getSymb();
+            for (OpenPos openPos : openPos) {
+                if (openPos.getSymb().equals(symb)) {
+                    o = openPos;
+                    break;
+                }
+            }
+            currentPrice = apiCall.GetCurrentPrice(symb);
+            if(o.getSide() == 'B')
+            {
+                openR = f.formatDoubleXX((currentPrice - o.getOpenPrice()) / o.getRisk());
+            }
+            else
+                openR = f.formatDoubleXX((o.getOpenPrice() - currentPrice) / o.getRisk());
             o.setCurrentPrice(f.formatDoubleXXX(currentPrice));
-            o.setOpenR(f.formatDoubleXX(((o.getCurrentPrice()-o.getOpenPrice())*o.getUnitsLeft())/p.getOneR()));
+            o.setOpenR(openR);
             json.update(openPos.get(i));
         }
         for(int i = 0; i< size;i++)
@@ -556,6 +602,10 @@ public class OpenPosTblView extends TableView<OpenPos> {
             openPos.setClosePrice(f.formatDoubleXXX(avg));
         }
 
+        if(openPos.getSide() == 'B')
+            openPos.setOpenR((openPos.getCurrentPrice() - openPos.getOpenPrice())/openPos.getRisk());
+        else
+            openPos.setOpenR(f.formatDoubleXX(openPos.getOpenPrice()-openPos.getCurrentPrice()) / openPos.getRisk());
         btnExecute.setVisible(false);
         tglBuy.setVisible(false);
         tglSell.setVisible(false);
@@ -582,8 +632,5 @@ public class OpenPosTblView extends TableView<OpenPos> {
             stage.show();
         }
     }
-
-
-
 }
 
