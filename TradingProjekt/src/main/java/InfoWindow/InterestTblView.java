@@ -24,6 +24,7 @@ public class InterestTblView extends TableView<PotentialPos> {
     Validation validate = new Validation();
     private ArrayList<PotentialPos> potentialPos = new ArrayList<PotentialPos>();
 
+
     public void handleAddInterestPos(TextField lblTickerRT, ToggleButton tglLong, TableView<PotentialPos> tblInterest, Label lblAdjR) {
 
         String adjRString = lblAdjR.getText();

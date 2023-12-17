@@ -26,7 +26,7 @@
    <children>
 
       <Label fx:id="errTickerLbl" layoutX="187.0" layoutY="103.0" prefHeight="25.0" prefWidth="260.0" text="Label" textFill="#ee0909" visible="false" />
-      <TableView fx:id="tblOpen" layoutX="10.0" layoutY="435.0" onMouseClicked="#addToExecute" prefHeight="185.0" prefWidth="771.0" style="-fx-alignment: center;">
+      <TableView fx:id="tblOpen" layoutX="10.0" layoutY="435.0" onMouseClicked="#addToExecuteOpenPosition" prefHeight="185.0" prefWidth="771.0" style="-fx-alignment: center;">
         <columns>
           <TableColumn fx:id="tblOpenSymb" prefWidth="50.0" style="-fx-alignment: center;" text="Ticker" />
           <TableColumn fx:id="tblOpenPrice" prefWidth="50.0" style="-fx-alignment: center;" text="Price" />
@@ -49,7 +49,7 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <TableView fx:id="tblInterest" layoutX="10.0" layoutY="116.0" onMousePressed="#interestToExecute" prefHeight="200.0" prefWidth="446.0">
+      <TableView fx:id="tblInterest" layoutX="10.0" layoutY="116.0" onMousePressed="#moveInterestToExecutePosition" prefHeight="200.0" prefWidth="446.0">
         <columns>
           <TableColumn fx:id="tblInterestSymb" prefWidth="40.0" style="-fx-alignment: center;" text="Symb" />
           <TableColumn fx:id="tblInterestPrice" prefWidth="40.0" style="-fx-alignment: center;" text="Price" />
@@ -235,12 +235,12 @@
             <ToggleButton fx:id="tglSellOP" mnemonicParsing="false" prefHeight="25.0" prefWidth="43.0" text="Sell" textFill="#c32020" toggleGroup="$tglBuySellOpenPos" />
          </children>
       </FlowPane>
-      <Button fx:id="btnExecuteOP" layoutX="461.0" layoutY="633.0" mnemonicParsing="false" onAction="#executeSaveOP" prefHeight="27.0" prefWidth="64.0" text="Execute" AnchorPane.bottomAnchor="10.0">
+      <Button fx:id="btnExecuteOP" layoutX="461.0" layoutY="633.0" mnemonicParsing="false" onAction="#executeOpenPos" prefHeight="27.0" prefWidth="64.0" text="Execute" AnchorPane.bottomAnchor="10.0">
          <font>
             <Font size="13.0" />
          </font>
       </Button>
-      <Button fx:id="btnChangeInterestPos" layoutX="461.0" layoutY="204.0" mnemonicParsing="false" onMouseClicked="#removePos" prefHeight="25.0" prefWidth="64.0" text="Remove" />
+      <Button fx:id="btnChangeInterestPos" layoutX="461.0" layoutY="204.0" mnemonicParsing="false" onMouseClicked="#removeFromInterestPosTbl" prefHeight="25.0" prefWidth="64.0" text="Remove" />
       <HBox layoutX="531.0" layoutY="65.0" prefHeight="172.0" prefWidth="326.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="65.0">
          <children>
             <VBox alignment="TOP_CENTER" prefHeight="172.0" prefWidth="52.0">
@@ -641,7 +641,7 @@
       <VBox layoutX="792.0" layoutY="465.0" prefHeight="80.0" prefWidth="58.0" AnchorPane.rightAnchor="10.0">
          <children>
             <Button fx:id="btnChangeTblOpenpos" minHeight="25.0" mnemonicParsing="false" onAction="#changeTblOpenPos" prefWidth="70.0" text="Change" />
-            <Button fx:id="removeOpenPos" minHeight="25.0" mnemonicParsing="false" onAction="#removeFromTbl" prefWidth="70.0" text="Remove">
+            <Button fx:id="removeOpenPos" minHeight="25.0" mnemonicParsing="false" onAction="#removeFromOpenPosTbl" prefWidth="70.0" text="Remove">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>

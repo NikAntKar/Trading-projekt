@@ -38,54 +38,25 @@ public class ActiveController implements Initializable {
     }
 
     @FXML
-    private ChoiceBox<String>  cbSymb;
-    @FXML
     private Parent rootNode;
     @FXML
     private AnchorPane rootPane;
-    // Toggle buttons and choisebox
+
+    // Toggle buttons and choicebox
     @FXML
-    private ToggleButton tglBuy;
-    @FXML
-    private ToggleButton tglSell;
-    @FXML
-    private ToggleButton tglLong;
-    @FXML
-    private ToggleButton tglShort;
-    @FXML
-    private ToggleGroup tglLongShort;
+    private ToggleButton tglBuy, tglSell, tglLong, tglBuyOP, tglSellOP;
     @FXML
     private ToggleGroup tglSellBuy;
     @FXML
-    private ToggleButton tglBuyOP;
-    @FXML
-    private ToggleButton tglSellOP;
-    @FXML
     private ToggleGroup tglBuySellOpenPos;
+    @FXML
+    private ChoiceBox<String>  cbSymb;
 
-
-    //TextFields, date and Labels
+    //TextFields &
     @FXML
-    private TextField tickerField;
+    private DatePicker dateColumn, dateColumnOPos;
     @FXML
-    private TextField priceField;
-    @FXML
-    private TextField unitsField;
-    @FXML
-    private Label errTickerLbl;
-    @FXML
-    private DatePicker dateColumn;
-    @FXML
-    private DatePicker dateColumnOPos;
-    @FXML
-    private TextField stopField;
-    @FXML
-    private TextField lblTickerRT;
-    @FXML
-    private TextField priceFieldOPos;
-    @FXML
-    private TextField unitsFieldsOpenP;
-
+    private TextField stopField, lblTickerRT, priceFieldOPos, unitsFieldsOpenP, unitsField, priceField, tickerField;
 
 
     //title bar
@@ -95,9 +66,7 @@ public class ActiveController implements Initializable {
     private Rectangle rectangleOpenWindow;
     @FXML
     private Pane topPane;
-
-
-
+    private Stage stage;
 
 
     // Market internals and portfolio status
@@ -106,26 +75,11 @@ public class ActiveController implements Initializable {
     @FXML
     private Circle iconPortfolioO10,iconPortfolioO20, iconPortfolio10O20;
     @FXML
-    private Label lblDrawdown;
+    private Label lblWorstCase, lblAdjr, lblOpenR, lblDrawdown;
     @FXML
-    private Label lblWorstCase, lblAdjr, lblOpenR;
+    private Label lblAtrDistIWM, lblAtrDistSPY, lblAtrDistQQQ, lblNewRisk;
 
-
-    @FXML
-    private Label lblAtrDistIWM;
-    @FXML
-    private Label lblAtrDistSPY;
-
-    @FXML
-    private Label lblAtrDistQQQ;
-
-    @FXML
-    private Label lblNewRisk;
-
-    private Stage stage;
-
-
-
+    // Labels for target, units and exists
     @FXML
     private Label lbl3RTarget,  lblMaxUnits, lblMinUnits, lblExists;
 
@@ -138,33 +92,13 @@ public class ActiveController implements Initializable {
     @FXML
     private TableView<OpenPos> tblOpen;
     @FXML
-    private TableColumn<OpenPos, Double> tblOpen3Atr;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpen3R;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpen6R;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpen9R;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpenR;
-    @FXML
-    private TableColumn<OpenPos, Double> tblWorstCase;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpenPrice;
-    @FXML
-    private TableColumn<OpenPos, Double> tblOpenStop;
+    private TableColumn<OpenPos, Double> tblOpen3Atr, tblOpen3R, tblOpen6R, tblOpen9R, tblOpenR, tblWorstCase,
+                                            tblOpenPrice, tblOpenStop,tblOpenThird, tblCurrentPrice, tblClosePrice;
     @FXML
     private TableColumn<OpenPos, String> tblOpenSymb;
     @FXML
-    private TableColumn<OpenPos, Double> tblOpenThird;
-    @FXML
-    private TableColumn<OpenPos, Double> tblCurrentPrice;
-    @FXML
-    private TableColumn<OpenPos, Double> tblClosePrice;
-    @FXML
-    private TableColumn<OpenPos, Integer> tblOpenULeft;
-    @FXML
-    private TableColumn<OpenPos, Integer> tblOpenUnits;
+    private TableColumn<OpenPos, Integer> tblOpenULeft, tblOpenUnits;
+
 
     // Tbl Interest TBL
     @FXML
@@ -194,28 +128,23 @@ public class ActiveController implements Initializable {
 
     // Buttons
     @FXML
-    private Button addBtn;
-    @FXML
-    private Button btnSwitchWindow;
-    @FXML
-    private Button btnChange;
-    @FXML
     private Button btnExecuteNP;
     @FXML
     private Button btnExecuteOP;
     @FXML
     private Button btnAddInterestTbl;
-    @FXML
-    private Button btnChangeInterestPos;
-    @FXML
-    private Button removeOpenPos;
-
 
     TopPaneActions topPaneActions = new TopPaneActions();
     OpenPosTblView openPosTblView = new OpenPosTblView();
     InterestTblView interestTblView = new InterestTblView();
     Validation validation = new Validation();
     RiskCalculator riskCalculator = new RiskCalculator();
+    ObservableList<OpenPos> tblOpen (){
+        return FXCollections.observableArrayList();
+    };
+    ObservableList<PotentialPos> interestList (){
+        return FXCollections.observableArrayList();
+    };
     @FXML
     void enterExecute(KeyEvent event) {
         if(event.getCode() == KeyCode.ENTER)
@@ -229,7 +158,7 @@ public class ActiveController implements Initializable {
     void enterInterestPosEnter(KeyEvent event) {
         if(event.getCode()== KeyCode.ENTER)
         {
-            interestPosAdd();
+            addPotentialPosToTbl();
         }
     }
 
@@ -262,36 +191,26 @@ public class ActiveController implements Initializable {
 
     public void changeTblOpenPos(ActionEvent event) throws IOException
     {
-
         openPosTblView.handleOpenConfirmWindow(tblOpen, this);
     }
 
 
     //Handle add of the pos in lblTickerRT field
-    private void interestPosAdd()
+    private void addPotentialPosToTbl()
     {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        boolean sumExist = false;
-        if(!interestTblView.getPotentialPos().isEmpty()) {
-            for (PotentialPos item : interestTblView.getPotentialPos()) {
-                if (lblTickerRT.getText().toUpperCase().equals(item.getSymb().toUpperCase())) {
-                    sumExist = true;
-                }
+            if (interestTblView.getPotentialPos().stream()
+                    .anyMatch(potentialPos -> potentialPos.getSymb().equals(lblTickerRT.getText().toUpperCase())))
+            {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Duplicate of symbol");
+                alert.setHeaderText(null);
+                alert.setContentText("You cant insert a symbol twice");
+                alert.showAndWait();
+                lblTickerRT.clear();
+            } else {
+                interestTblView.handleAddInterestPos(lblTickerRT, tglLong, tblInterest, lblAdjr);
             }
-        }
-        if(sumExist == true)
-        {
-            alert.setTitle("Duplicate of symbol");
-            alert.setHeaderText(null);
-            alert.setContentText("You cant insert a symbol twice");
-            alert.showAndWait();
-            lblTickerRT.clear();
-        }
-        else {
-            //InterestTblView i = new InterestTblView();
-            interestTblView.handleAddInterestPos(lblTickerRT,tglLong,tblInterest, lblAdjr);
-            for(PotentialPos item: interestTblView.getPotentialPos());
-        }
+
     }
 
     public void switchScene(ActionEvent actionEvent) throws IOException {
@@ -315,20 +234,17 @@ public class ActiveController implements Initializable {
         setUpOpenPositionsInfo();
     }
 
-
     public void setId()
     {
         openPosTblView.setRightId();
     }
-    public void removeFromTbl()
+    public void removeFromOpenPosTbl()
     {
-        JsonFixer json = new JsonFixer();
-        json.remove(tblOpen);
-        tblOpen.refresh();
+        openPosTblView.removeOpenPos(tblOpen);
         tblOpen.getSortOrder().add(tblOpenSymb);
         setUpOpenPositionsInfo();
     }
-    public void removePos()
+    public void removeFromInterestPosTbl()
     {
         interestTblView.handleRemovePos(tblInterest);
         interestTblView.refresh();
@@ -398,15 +314,15 @@ public class ActiveController implements Initializable {
         }
         tblOpen.getSortOrder().add(tblOpenSymb);
     }
-    public void interestToExecute()
+    public void moveInterestToExecutePosition()
     {
         tblInterest.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
-                PotentialPos p = interestTblView.handleMoveToExecute(tblInterest, tickerField, priceField, unitsField, stopField, tglBuy, tglSell);
+                interestTblView.handleMoveToExecute(tblInterest, tickerField, priceField, unitsField, stopField, tglBuy, tglSell);
             }
     });
     }
-    public void addToExecute() {
+    public void addToExecuteOpenPosition() {
         tblOpen.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
             {
@@ -428,30 +344,18 @@ public class ActiveController implements Initializable {
         riskCalculator.calcAdjR(lblAdjr);
     }
 
-    public void executeSaveOP() throws IOException {
+    public void executeOpenPos() throws IOException {
         boolean numbersTestPrice = validation.CheckNumberTextfields(priceFieldOPos);
         boolean numbersTestUnits = validation.CheckNumberTextfields(unitsFieldsOpenP);
         if(numbersTestUnits && numbersTestPrice)
         {
-        openPosTblView.SaveChanges(tblOpen, cbSymb, priceFieldOPos, unitsFieldsOpenP, dateColumnOPos,
+        openPosTblView.openPositionExecution(tblOpen, cbSymb, priceFieldOPos, unitsFieldsOpenP, dateColumnOPos,
                 lblSymbOp, lblUnitsOp, lblPriceOp, lblDateOp, tglBuyOP, tglSellOP, btnExecuteOP, this);
+            tblOpen.getSortOrder().add(tblOpenSymb);
+            setUpOpenPositionsInfo();
         }
-        tblOpen.getSortOrder().add(tblOpenSymb);
-        setUpOpenPositionsInfo();
     }
 
-    public void updateTable()
-    {
-        openPosTblView.updateTbl(tblOpen);
-    }
-    public void insertJson()
-    {
-        JsonFixer jsonFixer = new JsonFixer();
-        jsonFixer.loadToView(tblOpen);
-        ArrayList<OpenPos> openPosAdd = jsonFixer.addToList();
-        OpenPosTblView.addPos(openPosAdd);
-        updateTable();
-    }
 
     public void changeColorButton()
     {
@@ -481,7 +385,7 @@ public class ActiveController implements Initializable {
     }
 
 
-    private void handleEditInInterest(TableColumn.CellEditEvent<PotentialPos, Double> event) {
+    private void handleEditInInterestTbl(TableColumn.CellEditEvent<PotentialPos, Double> event) {
         if(validation.CheckNumberString(String.valueOf(event.getNewValue())))
         {
             TableColumn<PotentialPos, Double> eventColumn = event.getTableColumn();
@@ -489,15 +393,11 @@ public class ActiveController implements Initializable {
             i.handleEditInView(eventColumn, event, tblInterest, lblAdjr);
         }
     }
-    public void handleEditInOpenPos(TableColumn.CellEditEvent<OpenPos, Double> event)
+    public void handleEditInOpenPosTbl(TableColumn.CellEditEvent<OpenPos, Double> event)
     {
         TableColumn<OpenPos, Double> eventColumn = event.getTableColumn();
         openPosTblView.handleEditStop(eventColumn, event, tblOpen);
         setUpOpenPositionsInfo();
-    }
-
-    private void focusListenerLogic() {
-        handleLabels();
     }
 
     public void handleLabels()
@@ -516,27 +416,22 @@ public class ActiveController implements Initializable {
         json.loadToView(tblOpen);
         tblOpen.refresh();
         tblOpen.getSortOrder().add(tblOpenSymb);
-
     }
-    ObservableList<OpenPos> tblOpen (){
-        return FXCollections.observableArrayList();
-    };
-    ObservableList<PotentialPos> interestList (){
-        return FXCollections.observableArrayList();
-    };
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
         btnAddInterestTbl.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                interestPosAdd();
+                addPotentialPosToTbl();
             }
         });
 
         ChangeListener<Boolean> focusListener = (observable, oldValue, newValue) -> {
             if (!newValue) {
                 // At least one of the text fields lost focus, perform the logic
-                focusListenerLogic();
+                handleLabels();
                 changeColorButton();
             }
         };
@@ -548,7 +443,6 @@ public class ActiveController implements Initializable {
             }
         };
 
-        rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
 
         // Focuslistener
         tickerField.focusedProperty().addListener(focusListener);
@@ -556,7 +450,7 @@ public class ActiveController implements Initializable {
         stopField.focusedProperty().addListener(focusListener);
         unitsField.focusedProperty().addListener(focusListenerUnits);
         tglSellBuy.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            focusListenerLogic();
+            handleLabels();
         });
         tglBuySellOpenPos.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
@@ -607,11 +501,11 @@ public class ActiveController implements Initializable {
         });
         tblInterestRange.setCellValueFactory(new PropertyValueFactory<PotentialPos, Double>("rangeVAtr"));
         tblInterest3R.setCellValueFactory(new PropertyValueFactory<PotentialPos, Double>("threeRtarget"));
-        tblInterestPrice.setOnEditCommit(this::handleEditInInterest);
-        tblInterestStop.setOnEditCommit(this::handleEditInInterest);
-        tblInterestHod.setOnEditCommit(this::handleEditInInterest);
-        tblInterestHod.setOnEditCommit(this::handleEditInInterest);
-        tblInterestLod.setOnEditCommit(this::handleEditInInterest);
+        tblInterestPrice.setOnEditCommit(this::handleEditInInterestTbl);
+        tblInterestStop.setOnEditCommit(this::handleEditInInterestTbl);
+        tblInterestHod.setOnEditCommit(this::handleEditInInterestTbl);
+        tblInterestHod.setOnEditCommit(this::handleEditInInterestTbl);
+        tblInterestLod.setOnEditCommit(this::handleEditInInterestTbl);
         tblInterest.setItems(interestList());
         tblInterest.setEditable(true);
 
@@ -631,7 +525,7 @@ public class ActiveController implements Initializable {
             OpenPos item = event.getTableView().getItems().get(event.getTablePosition().getRow());
             item.setStop(event.getNewValue());
         });
-        tblOpenStop.setOnEditCommit(this::handleEditInOpenPos);
+        tblOpenStop.setOnEditCommit(this::handleEditInOpenPosTbl);
         tblOpenULeft.setCellValueFactory(new PropertyValueFactory<OpenPos, Integer>("unitsLeft"));
         tblOpenThird.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("thirdSell"));
         tblOpen3Atr.setCellValueFactory(new PropertyValueFactory<OpenPos, Double>("atrTarget"));
@@ -693,7 +587,6 @@ public class ActiveController implements Initializable {
 
         OpenPosTblView.addPos(openPosAdd);
         setId();
-        updateTable();
         setUpOpenPositionsInfo();
         setUpRiskInfo();
         tblOpen.getSortOrder().add(tblOpenSymb);

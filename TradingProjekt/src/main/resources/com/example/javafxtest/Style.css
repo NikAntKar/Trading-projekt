@@ -148,5 +148,11 @@
     -fx-background-radius: 1;
     -fx-text-fill: white;
     -fx-font-size:12;
-
+ }
+ #btnGoBack
+ {
+    -fx-background-color:  #212121;
+        -fx-background-radius: 1;
+        -fx-text-fill: white;
+        -fx-font-size:12;
  }

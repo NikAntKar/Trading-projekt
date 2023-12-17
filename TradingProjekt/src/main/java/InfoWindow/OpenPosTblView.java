@@ -40,6 +40,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
     FormatterClass f = new FormatterClass();
     Validation validation = new Validation();
     DatabaseController database = new DatabaseController();
+    JsonFixer jsonFixer = new JsonFixer();
     public static void addPos(ArrayList<OpenPos> o)
     {
         openPos.addAll(o);
@@ -104,9 +105,13 @@ public class OpenPosTblView extends TableView<OpenPos> {
                     posse.getHod(), stop, side, posse.getAdr(), posse.getRangeVAtr(), posse.getAtr(), dateColumn, currentR, takenR, adjR);
             openPos.add(o);
             items.add(o);
-            JsonFixer json = new JsonFixer();
-            json.add(o);
+            jsonFixer.add(o);
         }
+    }
+    public void removeOpenPos(TableView<OpenPos> openPosTbl)
+    {
+        jsonFixer.remove(openPosTbl);
+        openPosTbl.refresh();
     }
     public void HandleAddNewPosNew(TableView<OpenPos> tblOpenPos, String tickerF, String price, String stop,
                                    String units, DatePicker datePickere, char side, Label lblAdjR )
@@ -146,8 +151,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
         openPos.add(o);
         ObservableList<OpenPos> items = tblOpenPos.getItems();
         items.add(o);
-        JsonFixer json = new JsonFixer();
-        json.add(o);
+        jsonFixer.add(o);
     }
     public void HandleAddToOpenPos(TableView<OpenPos> tblOpenPos, OpenPos openPos, String priceF,
                                    String tickerF, String stopF, String unitsF, DatePicker dateColumn, char side )
@@ -195,7 +199,6 @@ public class OpenPosTblView extends TableView<OpenPos> {
                 openPos.setNineR(newOpenPrice + (newRisk*9-1));
             }
 
-           JsonFixer jsonFixer = new JsonFixer();
             for(int i = 0; i< size;i++)
             {
                 tblOpenPos.getItems().remove(0);
@@ -210,13 +213,12 @@ public class OpenPosTblView extends TableView<OpenPos> {
 
     public void setRightId()
     {
-        JsonFixer json = new JsonFixer();
         int id =0;
         for(OpenPos o: openPos)
         {
             id++;
             o.setId(id);
-            json.update(o);
+            jsonFixer.update(o);
         }
     }
 
@@ -249,40 +251,42 @@ public class OpenPosTblView extends TableView<OpenPos> {
     }
 
 
-    public void updateTbl(TableView<OpenPos> tblOpenPos )
-    {
-        double holdStop =0;
-        double holdPrice =0;
-        for(int i = 0; i< tblOpenPos.getItems().size(); i++){
-            OpenPos o = tblOpenPos.getItems().get(i);
 
-            holdStop= o.getStop();
-            holdPrice = o.getOpenPrice();
-            double risk = 0;
-            if(openPos.get(0).getSide()== 'B')
-            {
-                risk = holdPrice - holdStop;
-                o.setThreR(f.formatDoubleXX(o.getOpenPrice() + (risk) * 3));
-                o.setSixR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 6));
-                o.setNineR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 9));
-                openPos.get(i).setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
-                openPos.get(i).setSixR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 6));
-                openPos.get(i).setNineR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 9));
-                tblOpenPos.refresh();
-            }
-            else
-            {
-                risk = holdStop - holdPrice;
-                o.setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
-                o.setSixR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 6));
-                o.setNineR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 9));
-                openPos.get(i).setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
-                openPos.get(i).setSixR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 6));
-                openPos.get(i).setNineR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 9));
-            }
-        }
-
-    }
+        // WHY USE ?????
+//    public void updateTbl(TableView<OpenPos> tblOpenPos )
+//    {
+//        double holdStop =0;
+//        double holdPrice =0;
+//        for(int i = 0; i< tblOpenPos.getItems().size(); i++){
+//            OpenPos o = tblOpenPos.getItems().get(i);
+//
+//            holdStop= o.getStop();
+//            holdPrice = o.getOpenPrice();
+//            double risk = 0;
+//            if(openPos.get(0).getSide()== 'B')
+//            {
+//                risk = holdPrice - holdStop;
+//                o.setThreR(f.formatDoubleXX(o.getOpenPrice() + (risk) * 3));
+//                o.setSixR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 6));
+//                o.setNineR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 9));
+//                openPos.get(i).setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
+//                openPos.get(i).setSixR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 6));
+//                openPos.get(i).setNineR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 9));
+//                tblOpenPos.refresh();
+//            }
+//            else
+//            {
+//                risk = holdStop - holdPrice;
+//                o.setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
+//                o.setSixR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 6));
+//                o.setNineR(f.formatDoubleXX(o.getOpenPrice()  +(risk) * 9));
+//                openPos.get(i).setThreR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 3));
+//                openPos.get(i).setSixR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 6));
+//                openPos.get(i).setNineR(f.formatDoubleXX(o.getOpenPrice()  + (risk) * 9));
+//            }
+//        }
+//
+//    }
     public void setUpOpenPosLabels(TableView<OpenPos> openPostbl, Label lblWorstCase, Label lblOpenR)
     {
         double sumOpenR =0;
@@ -320,8 +324,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
         double worstCase = f.formatDoubleXX(handleWorstCase(o));
         o.setWorstCase(worstCase);
         item.setWorstCase(worstCase);
-        JsonFixer json = new JsonFixer();
-        json.update(o);
+        jsonFixer.update(o);
         tblOpenPos.refresh();
     }
     public double handleOpenR(OpenPos o)
@@ -342,7 +345,6 @@ public class OpenPosTblView extends TableView<OpenPos> {
     public void refresh(TableView<OpenPos> tblOpenPos)
     {
         ApiCall apiCall = new ApiCall();
-        JsonFixer json = new JsonFixer();
         Portfolio p = new Portfolio();
         double currentPrice;
         String symb;
@@ -367,13 +369,13 @@ public class OpenPosTblView extends TableView<OpenPos> {
                 openR = f.formatDoubleXX((o.getOpenPrice() - currentPrice) / o.getRisk());
             o.setCurrentPrice(f.formatDoubleXXX(currentPrice));
             o.setOpenR(openR);
-            json.update(openPos.get(i));
+            jsonFixer.update(openPos.get(i));
         }
         for(int i = 0; i< size;i++)
         {
             tblOpenPos.getItems().remove(0);
         }
-        json.loadToView(tblOpenPos);
+        jsonFixer.loadToView(tblOpenPos);
     }
 
 
@@ -459,20 +461,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
             alert.showAndWait();        }
         else
         {
-            int currentId =  o.getId();
-            int foundAt = 0;
-            boolean found = false;
-            int index = 0;
-            while( index <openPos.size() || !found) {
-                int idLoop =0;
-                idLoop = openPos.get(index).getId();
-                if(idLoop == currentId){
-                    foundAt = index;
-                }
-                found = true;
-                index ++;
-            }
-            data.setOpenPos(openPos.get(foundAt));
+            data.setOpenPos(tblOpen.getSelectionModel().getSelectedItem());
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/javafxtest/confirmWindow.fxml"));
             Parent root = loader.load();
             ConfirmWindowController c = loader.getController();
@@ -482,22 +471,11 @@ public class OpenPosTblView extends TableView<OpenPos> {
             stage.setScene(new Scene(root));
             stage.show();
         }
-
-
-
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/javafxtest/confirmWindow.fxml"));
-//        //FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/javafxtest/closedTrades-view.fxml"));
-//        root =loader.load();
-//        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-//        Scene scene = new Scene(root, 420, 475);
-//        stage.setScene(scene);
-//        stage.show();
     }
-    public void SaveChanges(TableView<OpenPos> tblOpenPos,  ChoiceBox<String> symbols,
-                            TextField priceF, TextField unitsF, DatePicker datePicker,
-                            Label symbTxt, Label unitsTxt, Label priceTxt, Label dateTxt,
-                            ToggleButton tglBuy, ToggleButton tglSell, Button btnExecute, ActiveController controller) throws IOException {
-        JsonFixer jsonFixer = new JsonFixer();
+    public void openPositionExecution(TableView<OpenPos> tblOpenPos, ChoiceBox<String> symbols,
+                                      TextField priceF, TextField unitsF, DatePicker datePicker,
+                                      Label symbTxt, Label unitsTxt, Label priceTxt, Label dateTxt,
+                                      ToggleButton tglBuy, ToggleButton tglSell, Button btnExecute, ActiveController controller) throws IOException {
         jsonFixer.read();
         LocalDate localDate = datePicker.getValue();
         String formattedDate = localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -603,9 +581,10 @@ public class OpenPosTblView extends TableView<OpenPos> {
         }
 
         if(openPos.getSide() == 'B')
-            openPos.setOpenR((openPos.getCurrentPrice() - openPos.getOpenPrice())/openPos.getRisk());
+            openPos.setOpenR(f.formatDoubleX((openPos.getCurrentPrice() - openPos.getOpenPrice())/openPos.getRisk()));
         else
-            openPos.setOpenR(f.formatDoubleXX(openPos.getOpenPrice()-openPos.getCurrentPrice()) / openPos.getRisk());
+            openPos.setOpenR(f.formatDoubleX((openPos.getOpenPrice()-openPos.getCurrentPrice()) / openPos.getRisk()));
+        System.out.println(openPos.getOpenR());
         btnExecute.setVisible(false);
         tglBuy.setVisible(false);
         tglSell.setVisible(false);

@@ -78,6 +78,13 @@
                <HBox.margin>
                   <Insets right="675.0" top="15.0" />
                </HBox.margin>
+               <children>
+                  <Button fx:id="btnGoBack" mnemonicParsing="false" onAction="#goBack" prefHeight="10.0" prefWidth="57.0" text="Back">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Button>
+               </children>
             </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="18.0" prefWidth="43.0">
                <children>

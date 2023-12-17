@@ -8,8 +8,13 @@ import com.example.javafxtest.TopPaneActions;
 import com.example.javafxtest.Validation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -18,7 +23,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ResourceBundle;
@@ -34,14 +41,6 @@ public class inDepthStatsView implements Initializable {
     private DatePicker datePickEndDate;
     @FXML
     private DatePicker datePickStartDate;
-    @FXML
-    private TreeTableColumn<?, ?> tbwPrice;
-
-    @FXML
-    private TreeTableColumn<?, ?> tbwSymbol;
-
-    @FXML
-    private TreeTableColumn<?, ?> tbwUnits;
 
     //Labels
     @FXML
@@ -51,16 +50,15 @@ public class inDepthStatsView implements Initializable {
             lblQQQ, lblSPY, lblIWM, lblIWMAtrdist,lblSPYAtrdist,lblQQQAtrdist, lblResultOfSearch,
             lblAtrTo10MAQQQ, lblAtrTo10MASPY, lblAtrTo10MAIWM;
 
+    @FXML
+    private Spinner<Integer> spinner;
+    @FXML
+    private CheckBox cbWinners, cbLosers;
 
     //Table
     @FXML
     private TableColumn<Trades, String> tblDate;
 
-    @FXML
-    private Spinner<Integer> spinner;
-    @FXML
-    private CheckBox cbWinners, cbLosers;
-    int currentValueInSpinner;
     @FXML
     private TableView<Trades> tblInDepthStats;
 
@@ -117,14 +115,8 @@ public class inDepthStatsView implements Initializable {
     }
 
     InDepthStatsController controller = new InDepthStatsController();
-    DatabaseController database = new DatabaseController();
-
     Validation validation = new Validation();
-    public void insertToTbl()
-    {
-        controller.setUpSymbolsTableView(tblSymbols);
-        //setUpSymbolsTableView(tblSymbols);
-    }
+
     public void insertTrades()
     {
         controller.setUpTradesTableView(tblInDepthStats, tblSymbols);
@@ -139,6 +131,14 @@ public class inDepthStatsView implements Initializable {
     }
     public void setUpMarketAtrDist() throws ParseException {
         controller.setUpMarketAtrDist(lblQQQAtrdist, lblSPYAtrdist,lblIWMAtrdist, tblInDepthStats.getItems().get(0).getDate());
+    }
+    public void goBack(ActionEvent actionEvent)throws IOException
+    {
+        Parent root = FXMLLoader.load(getClass().getResource("/com/example/javafxtest/closedTrades-view.fxml"));
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        Scene scene = new Scene( root, 860, 680);
+        stage.setScene(scene);
+        stage.show();
     }
     public void handleSearch()
     {
@@ -175,12 +175,12 @@ public class inDepthStatsView implements Initializable {
     };
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
         lblSymbol.setVisible(false);
         lblAtrTo10MAQQQ.setVisible(false);
         lblAtrTo10MAIWM.setVisible(false);
         lblAtrTo10MASPY.setVisible(false);
 
-        rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
 
         tblSymbol.setCellValueFactory(new PropertyValueFactory<Stats, String>("symb"));
         tblResult.setCellValueFactory(new PropertyValueFactory<Stats, Double>("result"));

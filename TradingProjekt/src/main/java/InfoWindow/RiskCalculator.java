@@ -105,128 +105,51 @@ public class RiskCalculator {
         double lastTradesScore = database.get10LastTrades()*0.25;
         portfolioScore += lastTradesScore;
     }
-
     public void setUpMarketScore(Label lblQQQ, Label lblSPY, Label lblIWM,
                                  Circle iconQqqma10, Circle iconQqqma20, Circle iconQqq10Over20,
                                  Circle iconSpyma10, Circle iconSpyma20, Circle iconSpy10Over20,
-                                 Circle iconIWMma10, Circle iconIwmma20, Circle iconIwm10Over20 )
+                                 Circle iconIWMma10, Circle iconIwmma20, Circle iconIwm10Over20)
     {
-        ApiCall apicall = new ApiCall();
+        processSymbol("qqq", iconQqqma10, iconQqqma20, iconQqq10Over20, lblQQQ);
+        processSymbol("spy", iconSpyma10, iconSpyma20, iconSpy10Over20, lblSPY);
+        processSymbol("iwm", iconIWMma10, iconIwmma20, iconIwm10Over20, lblIWM);
+    }
+    private void processSymbol(String symbol, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle, Label label) {
+        ApiCall apiCall = new ApiCall();
         LocalDate date = LocalDate.now();
         String stringDate = date.toString();
-        apicall.getSetAtrMa("qqq", stringDate);
-        double qqqMa10 = apicall.getMa10();
-        double qqqMa20 = apicall.getMa20();
-        double qqqPrice = apicall.GetCurrentPrice("qqq");
-        double qqqAtr = apicall.getAtr();
-        if(qqqPrice < qqqMa10)
-            iconQqqma10.setStyle("-fx-fill: #e53935");
-        else
-        {
+        apiCall.getSetAtrMa(symbol, stringDate);
+        double ma10 = apiCall.getMa10();
+        double ma20 = apiCall.getMa20();
+        double price = apiCall.GetCurrentPrice(symbol);
+        updateLabels(label,price, ma10, apiCall.getAtr() );
+        updateStyles(price, ma10, ma20, ma10Circle, ma20Circle, ma10Over20Circle);
+    }
+    private void updateStyles(double price, double ma10, double ma20, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle) {
+        String style = (price < ma10) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
+        ma10Circle.setStyle(style);
+        if (price < ma10) {
             marketMaScore += 0.5;
-            iconQqqma10.setStyle("-fx-fill: #388e3c;");
-        }
-        if(qqqPrice < qqqMa20)
-            iconQqqma20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconQqqma20.setStyle("-fx-fill: #388e3c;");
-        }
-        if(qqqMa10 < qqqMa20)
-            iconQqq10Over20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconQqq10Over20.setStyle("-fx-fill: #388e3c;");
         }
 
-        apicall.getSetAtrMa("SPY", stringDate);
-        double spyMa10 = apicall.getMa10();
-        double spyMa20 = apicall.getMa20();
-        double spyPrice = apicall.GetCurrentPrice("spy");
-        double spyAtr = apicall.getAtr();
-        if(spyPrice < spyMa10)
-            iconSpyma10.setStyle("-fx-fill: #e53935");
-        else
-        {
+        style = (price < ma20) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
+        ma20Circle.setStyle(style);
+        if (price < ma20) {
             marketMaScore += 0.5;
-            iconSpyma10.setStyle("-fx-fill: #388e3c;");
-        }
-        if(spyPrice < spyMa20)
-            iconSpyma20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconSpyma20.setStyle("-fx-fill: #388e3c;");
-        }
-        if(spyMa10 < spyMa20)
-            iconSpy10Over20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconSpy10Over20.setStyle("-fx-fill: #388e3c;");
         }
 
-        apicall.getSetAtrMa("iwm", stringDate);
-        double iwmMa10 = apicall.getMa10();
-        double iwmMa20 = apicall.getMa20();
-        double IWMPrice = apicall.GetCurrentPrice("iwm");
-        double iwmAtr = apicall.getAtr();
-        if(IWMPrice < iwmMa10)
-            iconIWMma10.setStyle("-fx-fill: #e53935");
-        else
-        {
+        style = (ma10 < ma20) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
+        ma10Over20Circle.setStyle(style);
+        if (ma10 < ma20) {
             marketMaScore += 0.5;
-            iconIWMma10.setStyle("-fx-fill: #388e3c;");
-        }
-        if(IWMPrice < iwmMa20)
-            iconIwmma20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconIwmma20.setStyle("-fx-fill: #388e3c;");
-        }
-        if(iwmMa10 < iwmMa20)
-            iconIwm10Over20.setStyle("-fx-fill: #e53935");
-        else
-        {
-            marketMaScore += 0.5;
-            iconIwm10Over20.setStyle("-fx-fill: #388e3c;");
-        }
-
-        double QQQdist = f.formatDoubleXX(((qqqPrice-qqqMa10)/qqqAtr));
-        int roundedQqqValue = (int) Math.round(QQQdist);
-        double SPYdist = f.formatDoubleXX(((spyPrice-spyMa10)/spyAtr));
-        int roundedSpyValue = (int) Math.round(SPYdist);
-        double IWMdist = f.formatDoubleXX(((IWMPrice-iwmMa10)/iwmAtr));
-        int roundedIwmValue = (int) Math.round(IWMdist);
-        marketAtrScore =0;
-        if(roundedQqqValue > 1)
-        {
-            int score = 1;
-            while (score < roundedQqqValue) {
-                marketAtrScore--;
-                roundedQqqValue --;
-            }
-        }
-        if(roundedSpyValue > 1)
-        {
-            int score = 1;
-            while (score < roundedSpyValue) {
-                marketAtrScore--;
-                roundedSpyValue --;
-            }
-        }
-        if(roundedIwmValue > 1)
-        {
-            int score = 1;
-            while (score < roundedIwmValue) {
-                marketAtrScore--;
-                roundedIwmValue --;
-            }
         }
     }
+    private void updateLabels(Label label, double price, double tenMa, double atr) {
+        double dist = f.formatDoubleXX(((price-tenMa)/atr));
+        label.setText(dist +" ATR");
+        label.setVisible(true);
+    }
+
     public void setUpDrawDownScore(Label lblDrawdown)
     {
         DatabaseController database = new DatabaseController();

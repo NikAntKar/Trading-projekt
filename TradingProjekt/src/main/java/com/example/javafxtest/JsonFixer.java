@@ -1,6 +1,5 @@
 package com.example.javafxtest;
 import InfoWindow.OpenPos;
-import InfoWindow.OpenPosTblView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -10,7 +9,6 @@ import javafx.scene.control.TableView;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,14 +22,14 @@ public class JsonFixer {
 
     }
 
-    String file1 = "OpenPositions.json";
     String file2 = "OpenPositionsTest.json";
+    String file1 = "OpenPositions.json";
 
     public void add(OpenPos openPos)
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String fileName = file2;
+        String fileName = file1;
         ArrayList<OpenPos> o = new ArrayList<OpenPos>();
 
             try {
@@ -57,7 +55,7 @@ public class JsonFixer {
 
     public OpenPos getOneItem(String symb)
     {
-        String fileName = file2;
+        String fileName = file1;
         OpenPos holdOpenPos = new OpenPos();
         try {
 
@@ -81,7 +79,7 @@ public class JsonFixer {
     }
     public void read()
     {
-        String fileName = file2;
+        String fileName = file1;
 
         try {
             // Create an ObjectMapper instance
@@ -94,7 +92,7 @@ public class JsonFixer {
 
     public ArrayList<OpenPos> addToList() {
         boolean fileIsEmpty = false;
-        String fileName = file2;
+        String fileName = file1;
         ArrayList<OpenPos> o = new ArrayList<OpenPos>();
 
 
@@ -120,7 +118,7 @@ public class JsonFixer {
 
     public void update(OpenPos openPos)
     {
-        String fileName = file2;
+        String fileName = file1;
         try {
             // Create an ObjectMapper instance
             ObjectMapper objectMapper = new ObjectMapper();
@@ -151,7 +149,7 @@ public class JsonFixer {
     public void loadToView(TableView<OpenPos> tblOpenPos)
     {
         boolean fileIsEmpty = false;
-        String fileName = file2;
+        String fileName = file1;
         if (isJsonFileEmpty(fileName)) {
             System.out.println("JSON file is empty.");
             fileIsEmpty = true;
@@ -188,7 +186,7 @@ public class JsonFixer {
         {
         int removeId= o.getId();
         int size = tblOpen.getItems().size();
-        String fileName = file2;
+        String fileName = file1;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             List<OpenPos> openPosInJson = objectMapper.readValue(new File(fileName), new TypeReference<List<OpenPos>>() {
@@ -214,7 +212,7 @@ public class JsonFixer {
     public void remove (OpenPos openPos)
     {
         int removeId= openPos.getId();
-        String fileName = file2;
+        String fileName = file1;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             List<OpenPos> openPosList = objectMapper.readValue(new File(fileName), new TypeReference<List<OpenPos>>() {
