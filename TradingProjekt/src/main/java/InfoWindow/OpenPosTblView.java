@@ -25,13 +25,8 @@ import java.util.ArrayList;
 public class OpenPosTblView extends TableView<OpenPos> {
 
     public OpenPosTblView(){
-    FormatterClass f = new FormatterClass();
-    Validation validation = new Validation();
 
     }
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
     private static ArrayList<OpenPos> openPos = new ArrayList<OpenPos>();
     DataHolder data = DataHolder.getInstance();
     public ArrayList<OpenPos> getOpenPos() {
@@ -326,10 +321,6 @@ public class OpenPosTblView extends TableView<OpenPos> {
         item.setWorstCase(worstCase);
         jsonFixer.update(o);
         tblOpenPos.refresh();
-    }
-    public double handleOpenR(OpenPos o)
-    {
-        return 0;
     }
     public double handleWorstCase(OpenPos o)
     {

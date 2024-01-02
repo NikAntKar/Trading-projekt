@@ -383,7 +383,9 @@ public class ActiveController implements Initializable {
             btnExecuteOP.setText("Sell");
         }
     }
-
+    public void manageChangeInTickerField(){
+        interestTblView.handleChangeInTickerField(tblOpen, tickerField, lblExists);
+    }
 
     private void handleEditInInterestTbl(TableColumn.CellEditEvent<PotentialPos, Double> event) {
         if(validation.CheckNumberString(String.valueOf(event.getNewValue())))
@@ -420,7 +422,7 @@ public class ActiveController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
+        //rectangleOpenWindow.getStyleClass().add("rectangle"); // Add the CSS style class
         btnAddInterestTbl.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -435,6 +437,14 @@ public class ActiveController implements Initializable {
                 changeColorButton();
             }
         };
+        ChangeListener<Boolean> focusListenerTicker = (observable, oldValue, newValue) -> {
+            if (!newValue) {
+                // At least one of the text fields lost focus, perform the logic
+                //handleLabels();
+                //changeColorButton();
+                manageChangeInTickerField();
+            }
+        };
         ChangeListener<Boolean> focusListenerUnits = (observable, oldValue, newValue) -> {
             if (!newValue) {
                 // At least one of the text fields lost focus, perform the logic
@@ -445,7 +455,7 @@ public class ActiveController implements Initializable {
 
 
         // Focuslistener
-        tickerField.focusedProperty().addListener(focusListener);
+        tickerField.focusedProperty().addListener(focusListenerTicker);
         priceField.focusedProperty().addListener(focusListener);
         stopField.focusedProperty().addListener(focusListener);
         unitsField.focusedProperty().addListener(focusListenerUnits);
@@ -562,7 +572,7 @@ public class ActiveController implements Initializable {
 
         // Reduce the ".00" from the column units
         tblInterestUnits.setCellFactory(column -> {
-            return new TableCell<PotentialPos, Double>() {
+            return new TableCell<>() {
                 @Override
                 protected void updateItem(Double item, boolean empty) {
                     super.updateItem(item, empty);
@@ -575,9 +585,9 @@ public class ActiveController implements Initializable {
                 }
             };
         });
-
-        dateColumn.getStyleClass().add("date-picker");
-        dateColumnOPos.getStyleClass().add("date-picker");
+//
+//        dateColumn.getStyleClass().add("date-picker");
+//        dateColumnOPos.getStyleClass().add("date-picker");
 
 
         // load Open pos to the tableView

@@ -5,23 +5,25 @@ import com.example.javafxtest.FormatterClass;
 import com.example.javafxtest.Validation;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 
 public class InterestTblView extends TableView<PotentialPos> {
-    // ... Code for configuring the table and handling its behavior
 
     public ArrayList<PotentialPos> getPotentialPos() {
         return potentialPos;
     }
 
     public InterestTblView() {
-        FormatterClass f = new FormatterClass();
     }
 
     FormatterClass f = new FormatterClass();
     Validation validate = new Validation();
+    DatabaseController database = new DatabaseController();
+    OpenPos openPos = new OpenPos();
+
     private ArrayList<PotentialPos> potentialPos = new ArrayList<PotentialPos>();
 
 
@@ -30,12 +32,10 @@ public class InterestTblView extends TableView<PotentialPos> {
         String adjRString = lblAdjR.getText();
         adjRString = adjRString.replace("%", "");
         double adjR = Double.parseDouble(adjRString);
-        DatabaseController database = new DatabaseController();
         double currentValue = database.getPortFolioCurrentValue();
         double dolRisk = f.formatDoubleXX(adjR *currentValue)/100;
         String symb = lblTickerRT.getText().toUpperCase();
         ApiCall apicall = new ApiCall(symb);
-        FormatterClass f = new FormatterClass();
         double price = f.formatDoubleXX(apicall.GetCurrentPrice(symb));
         double hod = f.formatDoubleXX(apicall.getHod());
         double lod = f.formatDoubleXX(apicall.getLod());
@@ -74,7 +74,6 @@ public class InterestTblView extends TableView<PotentialPos> {
     ) {
 
         double newValue = event.getNewValue();
-        FormatterClass f = new FormatterClass();
         TableColumn<PotentialPos, Double> editedColumn = eventColumn;
         PotentialPos item = event.getRowValue();
         String columnName = editedColumn.getText().toUpperCase();
@@ -104,7 +103,6 @@ public class InterestTblView extends TableView<PotentialPos> {
             String adjRString = lblAdjR.getText();
             adjRString = adjRString.replace("%", "");
             double adjR = Double.parseDouble(adjRString);
-            DatabaseController database = new DatabaseController();
             double currentValue = database.getPortFolioCurrentValue();
             double dolRisk = f.formatDoubleXX(adjR *currentValue)/100;
             int units = (int) Math.floor(dolRisk / fRisk);
@@ -156,7 +154,9 @@ public class InterestTblView extends TableView<PotentialPos> {
             }
         return exists;
     }
-    public void handleUnitsField(TableView<OpenPos> openPos, TextField tickerField, TextField priceField,
+
+
+    public void handleUnitsField(TableView<OpenPos> openPosTbl, TextField tickerField, TextField priceField,
                                  TextField stopField, TextField unitsField, Label lblNewRisk, ToggleButton tglBuy,
                                     Label lbl3RTarget, Label lblMaxUnits, Label lblMinUnits, Label lblExists )
     {
@@ -167,13 +167,12 @@ public class InterestTblView extends TableView<PotentialPos> {
             String stopF = stopField.getText();
             String unitsF = unitsField.getText();
             if(!unitsF.isEmpty()) {
-                OpenPos o = new OpenPos();
                 boolean exists = false;
                 int index = 0;
-                while (index < openPos.getItems().size() && !exists) {
-                    exists = tickerExists(tickerF, openPos.getItems().get(index));
+                while (index < openPosTbl.getItems().size() && !exists) {
+                    exists = tickerExists(tickerF, openPosTbl.getItems().get(index));
                     if (exists) {
-                        o = openPos.getItems().get(index);
+                        openPos = openPosTbl.getItems().get(index);
                         exists = true;
                     }
                     index++;
@@ -184,7 +183,6 @@ public class InterestTblView extends TableView<PotentialPos> {
                     int units = Integer.parseInt(unitsF);
                     double riskPerUni = 0;
                     double totalRisk = 0;
-                    DatabaseController database = new DatabaseController();
                     database.getPortFolioCurrentValue();
                     double currentOneR = database.getPortFolioCurrentValue() * 0.01;
                     double rForPos = 0;
@@ -202,9 +200,9 @@ public class InterestTblView extends TableView<PotentialPos> {
                             lblNewRisk.setText("Risk " + rForPos + "%");
                         }
                     } else {
-                        double oldStop = o.getStop();
-                        double oldAvg = o.getOpenPrice();
-                        double unitsOpen = o.getUnitsLeft();
+                        double oldStop = openPos.getStop();
+                        double oldAvg = openPos.getOpenPrice();
+                        double unitsOpen = openPos.getUnitsLeft();
                         double newRisk = 0;
                         double currentRisk = 0;
                         double totalR = 0;
@@ -228,13 +226,33 @@ public class InterestTblView extends TableView<PotentialPos> {
 
         }
     }
-
-    public void handleLabelsActions(TableView<OpenPos> openPos, Label lbl3RTarget, Label lblMaxUnits, Label lblMinUnits,
+    public boolean tickerExists(ArrayList<OpenPos> openPosArray, String ticker)
+    {
+        return openPosArray.stream().anyMatch(pos -> pos.getSymb().equals(ticker));
+    }
+    public void handleChangeInTickerField(TableView<OpenPos> openPosTbl, TextField ticker, Label lblExists)
+    {
+        String tickerF = ticker.getText().toUpperCase();
+        boolean exists = false;
+        if(!tickerF.isEmpty() )
+        {
+            ArrayList<OpenPos> openPosList = new ArrayList<>(openPosTbl.getItems());
+            exists = openPosList.stream().anyMatch(pos -> pos.getSymb().equals(tickerF));
+            if(!exists)
+            {
+                lblExists.setVisible(false);
+                //lblNewRisk.setVisible(false);
+            }
+            else
+            {
+                lblExists.setVisible(true);
+            }
+        }
+    }
+    public void handleLabelsActions(TableView<OpenPos> openPosTbl, Label lbl3RTarget, Label lblMaxUnits, Label lblMinUnits,
                                     ToggleButton tglBuy, double risk, TextField tickerField, TextField priceField,
                                     TextField unitsField, TextField stopField, Label lblExists, Label lblNewRisk
     ) {
-
-        DatabaseController database = new DatabaseController();
         double currentValue = database.getPortFolioCurrentValue();
         double adjR = currentValue * (risk * 0.01);
         double currentOneR = currentValue * 0.01;
@@ -244,7 +262,6 @@ public class InterestTblView extends TableView<PotentialPos> {
         String unitsF = unitsField.getText();
         double calcUnitsDouble = 0;
         boolean exists = false;
-        OpenPos o = new OpenPos();
         double price =0;
         double stop =0;
         boolean existsTest = false;
@@ -265,12 +282,12 @@ public class InterestTblView extends TableView<PotentialPos> {
         if(!tickerF.isEmpty() )
         {
             int index = 0;
-            while ( index < openPos.getItems().size() && !existsTest) {
-                existsTest =  tickerExists(tickerF, openPos.getItems().get(index));
+            while ( index < openPosTbl.getItems().size() && !existsTest) {
+                existsTest =  tickerExists(tickerF, openPosTbl.getItems().get(index));
                 if (existsTest)
                 {
                     lblExists.setVisible(true);
-                    o=openPos.getItems().get(index);
+                    openPos=openPosTbl.getItems().get(index);
                     exists = true;
                 }
                 index++;
@@ -284,7 +301,7 @@ public class InterestTblView extends TableView<PotentialPos> {
         if(!priceF.isEmpty() && exists)
         {
             price = Double.parseDouble(priceF);
-            stop = o.getStop();
+            stop = openPos.getStop();
         }
         if(!priceF.isEmpty() && !stopF.isEmpty())
         {
@@ -294,12 +311,12 @@ public class InterestTblView extends TableView<PotentialPos> {
         if(exists &&!priceF.isEmpty())
         {
             lblNewRisk.setVisible(true);
-            double currentStop = o.getStop();
+            double currentStop = openPos.getStop();
             if(stopF.isEmpty())
             {
                 stopField.setText(String.valueOf(currentStop));
             }
-            double currentAvg = o.getOpenPrice();
+            double currentAvg = openPos.getOpenPrice();
             if(currentAvg < currentStop)
             {
                 /// Work in progress
@@ -307,13 +324,13 @@ public class InterestTblView extends TableView<PotentialPos> {
             else
             {
                 double newRisk = price-stop;
-                if(o.getSide() == 'B') {
+                if(openPos.getSide() == 'B') {
                     newRisk = price-stop;
                 }
                 else
                     newRisk = stop - price;
-                double currentTotalRiskPerUnits = ( currentAvg - o.getStop());
-                double riskOpen = (currentTotalRiskPerUnits * o.getUnitsLeft());
+                double currentTotalRiskPerUnits = ( currentAvg - openPos.getStop());
+                double riskOpen = (currentTotalRiskPerUnits * openPos.getUnitsLeft());
                 double currentRiskOpen =  adjR - riskOpen;
                 double additionalSharesToBuy = currentRiskOpen / newRisk;
                 int addInt = (int) Math.round(additionalSharesToBuy);
@@ -329,9 +346,9 @@ public class InterestTblView extends TableView<PotentialPos> {
                     newR =  f.formatDoubleXX((riskOpen + (newRisk * intUnits ))/currentOneR);
                 }
                     double newTotalRisk = newRisk * addInt;
-                    double totalUnits = o.getUnitsLeft() + addInt;
+                    double totalUnits = openPos.getUnitsLeft() + addInt;
                     riskPerUni = (newTotalRisk + riskOpen) / totalUnits;
-                    maxUnits = (int) (maxRisk / riskPerUni) - o.getUnitsLeft();
+                    maxUnits = (int) (maxRisk / riskPerUni) - openPos.getUnitsLeft();
                      lblNewRisk.setText("Risk " + newR + "%");
             }
             lblMaxUnits.setText("Max " + maxUnits);
@@ -363,7 +380,7 @@ public class InterestTblView extends TableView<PotentialPos> {
             if(risk == 0.25)
                 minUnits = unitsInt;
             else
-                minUnits = (int) (minRisk / riskPerUni) - o.getUnitsLeft();
+                minUnits = (int) (minRisk / riskPerUni) - openPos.getUnitsLeft();
             lblMaxUnits.setText("Max " + maxUnits);
             lblMinUnits.setText("Min " + minUnits);
             lblNewRisk.setText("Risk " +currentR + "%");
