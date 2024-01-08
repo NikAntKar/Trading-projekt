@@ -704,17 +704,9 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <VBox prefHeight="28.0" prefWidth="140.0">
+            <VBox prefHeight="40.0" prefWidth="74.0">
                <children>
-                  <Label fx:id="lblNewRisk" prefHeight="14.0" prefWidth="145.0" text="New risk XXX">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="lbl3RTarget" contentDisplay="RIGHT" prefHeight="14.0" prefWidth="121.0" text="3R Taget XXX">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
+                  <Label fx:id="lblNewRisk" prefHeight="20.0" prefWidth="73.0" text="Risk XXX">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -724,7 +716,12 @@
                   <Insets left="10.0" />
                </HBox.margin>
             </VBox>
-            <VBox prefHeight="42.0" prefWidth="64.0">
+            <VBox prefHeight="40.0" prefWidth="57.0">
+               <children>
+                  <Circle fx:id="iconRisk" radius="10.0" stroke="RED" strokeType="INSIDE" strokeWidth="0.0" />
+               </children>
+            </VBox>
+            <VBox prefHeight="40.0" prefWidth="66.0">
                <children>
                   <HBox prefHeight="20.0" prefWidth="140.0">
                      <children>
@@ -732,6 +729,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
                         </Label>
                      </children>
                   </HBox>
@@ -746,6 +746,11 @@
                   </HBox>
                </children>
             </VBox>
+            <Label fx:id="lbl3RTarget" contentDisplay="RIGHT" prefHeight="20.0" prefWidth="99.0" text="3R Taget XXX">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
          </children>
       </HBox>
       <Pane layoutX="724.0" layoutY="436.0" prefHeight="3.0" prefWidth="136.0" style="-fx-background-color: #bdbdbd;" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="435.0" />

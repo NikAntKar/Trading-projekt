@@ -75,6 +75,8 @@ public class ActiveController implements Initializable {
     @FXML
     private Circle iconPortfolioO10,iconPortfolioO20, iconPortfolio10O20;
     @FXML
+    private Circle iconRisk;
+    @FXML
     private Label lblWorstCase, lblAdjr, lblOpenR, lblDrawdown;
     @FXML
     private Label lblAtrDistIWM, lblAtrDistSPY, lblAtrDistQQQ, lblNewRisk;
@@ -134,6 +136,7 @@ public class ActiveController implements Initializable {
     @FXML
     private Button btnAddInterestTbl;
 
+
     TopPaneActions topPaneActions = new TopPaneActions();
     OpenPosTblView openPosTblView = new OpenPosTblView();
     InterestTblView interestTblView = new InterestTblView();
@@ -161,6 +164,7 @@ public class ActiveController implements Initializable {
             addPotentialPosToTbl();
         }
     }
+
 
     @FXML
     private void minimize(MouseEvent event)
@@ -210,7 +214,6 @@ public class ActiveController implements Initializable {
             } else {
                 interestTblView.handleAddInterestPos(lblTickerRT, tglLong, tblInterest, lblAdjr);
             }
-
     }
 
     public void switchScene(ActionEvent actionEvent) throws IOException {
@@ -319,6 +322,7 @@ public class ActiveController implements Initializable {
         tblInterest.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
                 interestTblView.handleMoveToExecute(tblInterest, tickerField, priceField, unitsField, stopField, tglBuy, tglSell);
+                manageChangePriceField();
             }
     });
     }
@@ -387,6 +391,12 @@ public class ActiveController implements Initializable {
         interestTblView.handleChangeInTickerField(tblOpen, tickerField, lblExists);
     }
 
+    public void manageChangePriceField()
+    {
+        interestTblView.handlePriceAndStopFieldChanges(tblOpen, tickerField, priceField, stopField, unitsField, tglBuy
+                                                    ,riskCalculator.getRisk(), lbl3RTarget, lblMaxUnits, lblMinUnits
+                                                    ,lblNewRisk, iconRisk);
+    }
     private void handleEditInInterestTbl(TableColumn.CellEditEvent<PotentialPos, Double> event) {
         if(validation.CheckNumberString(String.valueOf(event.getNewValue())))
         {
@@ -404,8 +414,8 @@ public class ActiveController implements Initializable {
 
     public void handleLabels()
     {
-        interestTblView.handleLabelsActions(tblOpen, lbl3RTarget, lblMaxUnits, lblMinUnits, tglBuy,
-                riskCalculator.getRisk(), tickerField, priceField, unitsField, stopField, lblExists, lblNewRisk);
+        //interestTblView.handleLabelsActions(tblOpen, lbl3RTarget, lblMaxUnits, lblMinUnits, tglBuy,
+          //      riskCalculator.getRisk(), tickerField, priceField, unitsField, stopField, lblExists, lblNewRisk);
     }
     public void setBackResult()
     {
@@ -433,6 +443,7 @@ public class ActiveController implements Initializable {
         ChangeListener<Boolean> focusListener = (observable, oldValue, newValue) -> {
             if (!newValue) {
                 // At least one of the text fields lost focus, perform the logic
+                manageChangePriceField();
                 handleLabels();
                 changeColorButton();
             }
@@ -449,7 +460,7 @@ public class ActiveController implements Initializable {
             if (!newValue) {
                 // At least one of the text fields lost focus, perform the logic
                 interestTblView.handleUnitsField(tblOpen, tickerField, priceField, stopField, unitsField, lblNewRisk, tglBuy,
-                                                 lbl3RTarget, lblMaxUnits, lblMinUnits, lblExists);
+                                                 lbl3RTarget, lblMaxUnits, lblMinUnits, lblExists, iconRisk);
             }
         };
 
@@ -568,6 +579,8 @@ public class ActiveController implements Initializable {
         dateColumnOPos.setVisible(false);
         tglBuyOP.setVisible(false);
         tglSellOP.setVisible(false);
+        iconRisk.setVisible(false);
+
 
 
         // Reduce the ".00" from the column units
