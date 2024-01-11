@@ -314,6 +314,7 @@ public class ActiveController implements Initializable {
             lbl3RTarget.setVisible(false);
             lblMaxUnits.setVisible(false);
             lblMinUnits.setVisible(false);
+            iconRisk.setVisible(false);
         }
         tblOpen.getSortOrder().add(tblOpenSymb);
     }
@@ -408,7 +409,7 @@ public class ActiveController implements Initializable {
     public void handleEditInOpenPosTbl(TableColumn.CellEditEvent<OpenPos, Double> event)
     {
         TableColumn<OpenPos, Double> eventColumn = event.getTableColumn();
-        openPosTblView.handleEditStop(eventColumn, event, tblOpen);
+        openPosTblView.handleEditStop(event, tblOpen);
         setUpOpenPositionsInfo();
     }
 

@@ -4,7 +4,6 @@ import com.example.javafxtest.ApiCall;
 import com.example.javafxtest.FormatterClass;
 import com.example.javafxtest.Validation;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.shape.Circle;
 
@@ -74,7 +73,6 @@ public class InterestTblView extends TableView<PotentialPos> {
             TableColumn.CellEditEvent<PotentialPos, Double> event,
             TableView<PotentialPos> tblInterest, Label lblAdjR
     ) {
-
         double newValue = event.getNewValue();
         TableColumn<PotentialPos, Double> editedColumn = eventColumn;
         PotentialPos item = event.getRowValue();
@@ -150,9 +148,7 @@ public class InterestTblView extends TableView<PotentialPos> {
     {
         boolean exists = false;
             if (openPos.getSymb().equals(ticker))
-            {
                 exists = true;
-            }
         return exists;
     }
 
@@ -188,7 +184,6 @@ public class InterestTblView extends TableView<PotentialPos> {
                 database.getPortFolioCurrentValue();
                 double currentOneR = database.getPortFolioCurrentValue() * 0.01;
                 double rForPos = 0;
-
                 if (!exists) {
                     if (tglBuy.isSelected()) {
                         riskPerUnit = price - stop;
@@ -245,6 +240,20 @@ public class InterestTblView extends TableView<PotentialPos> {
             }
         }
     }
+    public double calcRiskPerUni(double price, double stop, char side)
+    {
+        if(side == 'B')
+            return price - stop;
+        else
+            return stop - price;
+    }
+    public boolean isInTheMoneyStop(double openPrice, double stop, char side)
+    {
+        if(side == 'B')
+            return openPrice < stop;
+        else
+            return openPrice > stop;
+    }
     public void handlePriceAndStopFieldChanges(TableView<OpenPos> openPosTbl, TextField tickerField, TextField priceField,
                                                TextField stopField, TextField unitsField, ToggleButton tglBuy, double risk
                                               ,Label lblTreR, Label lblMaxUnits, Label lblMinUnits, Label lblRisk, Circle iconRisk)
@@ -259,20 +268,31 @@ public class InterestTblView extends TableView<PotentialPos> {
             double price = Double.parseDouble(priceF);
             double stop = Double.parseDouble(stopF);
             double riskPerUnit = 0;
+            char side;
+            if(tglBuy.isSelected())
+                side = 'B';
+            else
+                side = 'S';
             ArrayList<OpenPos> openPosList = new ArrayList<>(openPosTbl.getItems());
             OpenPos o = openPosList.stream().filter(pos -> pos.getSymb().equalsIgnoreCase(tickerF)).findAny().orElse(null);
-            if(o == null)
-            {
-                if(tglBuy.isSelected())
-                {
-                    riskPerUnit = price-stop;
-                    calcUnitsDouble = f.formatDouble(adjR / (riskPerUnit));
+            if(o == null){
+                riskPerUnit = calcRiskPerUni(price, stop, side);
+                calcUnitsDouble = adjR / (riskPerUnit);
+            }
+            else{
+                boolean profitStop = isInTheMoneyStop(o.getOpenPrice(), o.getStop(), o.getSide());
+                System.out.println(profitStop);
+                if(profitStop) {
+                    riskPerUnit = calcRiskPerUni(price, stop, side);
+                    calcUnitsDouble = adjR / (riskPerUnit) - o.getUnitsLeft();
                 }
-                else
-                {
-                    riskPerUnit = stop - price;
-                    calcUnitsDouble = f.formatDouble(adjR / (riskPerUnit));
-                }
+                double currentR = database.getPortFolioCurrentValue() * (risk * 0.01);
+                double openRisk = calcRiskPerUni(price, o.getStop(), o.getSide()) * o.getUnitsLeft();
+                double addUnits = (currentR - openRisk) / (calcRiskPerUni(price, stop, o.getSide()));
+                System.out.println(currentR + " risk");
+                System.out.println(openRisk + " open risk");
+                System.out.println(addUnits);
+                System.out.println(risk);
             }
             int unitsInt = (int) Math.round(calcUnitsDouble);
             unitsField.setText(Integer.toString(unitsInt));
@@ -317,8 +337,6 @@ public class InterestTblView extends TableView<PotentialPos> {
             maxUnits = (int) Math.round(maxRisk / (riskPerUnit));
             minUnits = (int) Math.round(minRisk / (riskPerUnit));
         }
-        System.out.println(riskPerUnit);
-
         lblMaxUnits.setText("Max " + maxUnits);
         lblMinUnits.setText("Min " + minUnits);
     }
