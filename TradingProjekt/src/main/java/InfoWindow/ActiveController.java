@@ -389,7 +389,7 @@ public class ActiveController implements Initializable {
         }
     }
     public void manageChangeInTickerField(){
-        interestTblView.handleChangeInTickerField(tblOpen, tickerField, lblExists);
+        interestTblView.handleChangeInTickerField(tblOpen, tickerField, lblExists, stopField);
     }
 
     public void manageChangePriceField()

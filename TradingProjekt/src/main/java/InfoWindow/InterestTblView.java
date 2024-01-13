@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -221,7 +222,7 @@ public class InterestTblView extends TableView<PotentialPos> {
     {
         return openPosArray.stream().anyMatch(pos -> pos.getSymb().equals(ticker));
     }
-    public void handleChangeInTickerField(TableView<OpenPos> openPosTbl, TextField ticker, Label lblExists)
+    public void handleChangeInTickerField(TableView<OpenPos> openPosTbl, TextField ticker, Label lblExists, TextField stopField)
     {
         String tickerF = ticker.getText().toUpperCase();
         boolean exists = false;
@@ -237,6 +238,8 @@ public class InterestTblView extends TableView<PotentialPos> {
             else
             {
                 lblExists.setVisible(true);
+                Optional<Double> stopOptional = openPosList.stream().filter(pos -> pos.getSymb().equals(tickerF)).map(OpenPos::getStop).findAny();
+                stopField.setText(String.valueOf(stopOptional.orElse(0.0)));
             }
         }
     }
