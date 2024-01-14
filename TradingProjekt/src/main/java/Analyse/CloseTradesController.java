@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
+import java.util.stream.Collectors;
 
 public class CloseTradesController {
 
@@ -128,6 +130,52 @@ public class CloseTradesController {
         m.setIwmAtrDistk(f.formatDoubleXX(((iPrice - iTen) / iTen) * 100));
         marketInfo.add(m);
         controller.insertMarketInfo(m);
+    }
+    public void addStatsToTb(OpenPos o) {
+        Stats s = new Stats();
+        int size = stats.size();
+        int lastValue;
+        if (size != 0) {
+            lastValue = stats.get(size - 1).getId()+1;
+            s.setId(lastValue);
+        } else {
+            s.setId(1);
+        }
+        char wl = 0;
+        double result = 0;
+        int totalUnits = 0;
+        String openDate = o.getDate().get(0);
+        String closeDate = o.getDate().get(o.getDate().size() - 1);
+        String dayOfWeek = getDayOfWeek(openDate);
+        String month = getMonth(openDate);
+        int holdDays = calcHoldTime(openDate, closeDate) - 1;
+        for (int i = 0; i < o.getUnits().size(); i++) {
+            if(o.getSideAtindex(i)=='B')
+                totalUnits += o.getUnitsAtIndex(i);
+        }
+        if (o.getSide() == 'B') {
+            if (o.getOpenPrice() < o.getClosePrice())
+                wl = 'W';
+            else {
+                wl = 'L';
+            }
+            result = f.formatDoubleXX((o.getClosePrice() - o.getOpenPrice()) * totalUnits);
+        } else {
+            if (o.getOpenPrice() > o.getClosePrice()) {
+                wl = 'W';
+            } else {
+                wl = 'S';
+            }
+            result = f.formatDoubleXX((o.getOpenPrice() - o.getClosePrice()) * totalUnits);
+        }
+        double adjDolRik = o.getCurrentR()* o.getCalcAdjR();
+        double adjRResult = f.formatDoubleXX((result / adjDolRik));
+        double rResult = f.formatDoubleXX(result / o.getCurrentR());
+        double percentResult = f.formatDoubleXXX(((o.getClosePrice() - o.getOpenPrice()) / o.getOpenPrice()) * 100);
+        Stats st = new Stats(s.getId(), o.getSymb(), wl, o.getSide(), o.getOpenPrice(), o.getClosePrice(), result, percentResult, rResult, adjRResult,
+                dayOfWeek, month, holdDays);
+        stats.add(st);
+        controller.insertStats(st, openDate);
     }
 
     public void addStatsToDb(OpenPos o) {
@@ -251,52 +299,6 @@ public class CloseTradesController {
         r.setIdStats(controller.getIdStats());
         controller.insertRisk(r);
     }
-    public void addStatsToTb(OpenPos o) {
-        Stats s = new Stats();
-        int size = stats.size();
-        int lastValue;
-        if (size != 0) {
-            lastValue = stats.get(size - 1).getId()+1;
-            s.setId(lastValue);
-        } else {
-            s.setId(1);
-        }
-        char wl = 0;
-        double result = 0;
-        int totalUnits = 0;
-        String openDate = o.getDate().get(0);
-        String closeDate = o.getDate().get(o.getDate().size() - 1);
-        String dayOfWeek = getDayOfWeek(openDate);
-        String month = getMonth(openDate);
-        int holdDays = calcHoldTime(openDate, closeDate) - 1;
-        for (int i = 0; i < o.getUnits().size(); i++) {
-           if(o.getSideAtindex(i)=='B')
-                totalUnits += o.getUnitsAtIndex(i);
-        }
-        if (o.getSide() == 'B') {
-            if (o.getOpenPrice() < o.getClosePrice())
-                wl = 'W';
-            else {
-                wl = 'L';
-            }
-            result = f.formatDoubleXX((o.getClosePrice() - o.getOpenPrice()) * totalUnits);
-        } else {
-            if (o.getOpenPrice() > o.getClosePrice()) {
-                wl = 'W';
-            } else {
-                wl = 'S';
-            }
-            result = f.formatDoubleXX((o.getOpenPrice() - o.getClosePrice()) * totalUnits);
-        }
-        double adjDolRik = o.getCurrentR()* o.getCalcAdjR();
-        double adjRResult = f.formatDoubleXX((result / adjDolRik));
-        double rResult = f.formatDoubleXX(result / o.getCurrentR());
-        double percentResult = f.formatDoubleXXX(((o.getClosePrice() - o.getOpenPrice()) / o.getOpenPrice()) * 100);
-        Stats st = new Stats(s.getId(), o.getSymb(), wl, o.getSide(), o.getOpenPrice(), o.getClosePrice(), result, percentResult, rResult, adjRResult,
-               dayOfWeek, month, holdDays);
-        stats.add(st);
-        controller.insertStats(st, openDate);
-    }
 
 
     public String getDayOfWeek(String theDate) {
@@ -373,59 +375,27 @@ public class CloseTradesController {
         for(int i = 0; i<stats.size(); i++)
         {
             int value = (int) Math.round(stats.get(i).getResultR());
-            switch (value)
-            {
-                case -5:
-                    values[0] = values[0]+1;
-                    break;
-                case -4:
-                    values[1] = values[1]+1;
-                    break;
-                case -3:
-                    values[2] = values[2]+1;
-                    break;
-                case -2:
-                    values[3] = values[3]+1;
-                    break;
-                case -1:
-                    values[4] = values[4]+1;
-                    break;
-                case 0:
-                    values[5] = values[5]+1;
-                    break;
-                case 1:
-                    values[6] = values[6]+1;
-                    break;
-                case 2:
-                    values[7] = values[7]+1;
-                    break;
-                case 3:
-                    values[8] = values[8]+1;
-                    break;
-                case 4:
-                    values[9] = values[9]+1;
-                    break;
-                case 5:
-                    values[10] = values[10]+1;
-                    break;
-                case 6:
-                    values[11] = values[11]+1;
-                    break;
-                case 7:
-                    values[12] = values[12]+1;
-                    break;
-                case 8:
-                    values[13] = values[13]+1;
-                    break;
-                case 9:
-                    values[14] = values[14]+1;
-                    break;
-                default:
+            switch (value) {
+                case -5 -> values[0] = values[0] + 1;
+                case -4 -> values[1] = values[1] + 1;
+                case -3 -> values[2] = values[2] + 1;
+                case -2 -> values[3] = values[3] + 1;
+                case -1 -> values[4] = values[4] + 1;
+                case 0 -> values[5] = values[5] + 1;
+                case 1 -> values[6] = values[6] + 1;
+                case 2 -> values[7] = values[7] + 1;
+                case 3 -> values[8] = values[8] + 1;
+                case 4 -> values[9] = values[9] + 1;
+                case 5 -> values[10] = values[10] + 1;
+                case 6 -> values[11] = values[11] + 1;
+                case 7 -> values[12] = values[12] + 1;
+                case 8 -> values[13] = values[13] + 1;
+                case 9 -> values[14] = values[14] + 1;
+                default -> {
                     if (value >= 10)
                         values[15] = values[15] + 1;
-                    else if (value <= -5)
-                        values[0] = values[0] + 1;
-                    break;
+                    else values[0] = values[0] + 1;
+                }
             }
         }
         XYChart.Series<String, Integer> serie = new XYChart.Series<>();
@@ -435,6 +405,17 @@ public class CloseTradesController {
         }
         barChart.getData().addAll(serie);
     }
+    public void setUpWinLossLabels(Label lblAveragePercentWin,Label lblAveragePercentLoss,Label lblAverageRWin,
+                                   Label lblAverageRLoss,Label lblAverageAdjRWin, Label lblAverageAdjRLoss,
+                                   Label lblBiggestRWin, Label lblBiggestRLoss){
+        lblAveragePercentWin.setText(calcAveragePercent('W') +"%");
+        lblAveragePercentLoss.setText(calcAveragePercent('L') +"%");
+        lblAverageRWin.setText(calcAverageR('W')+"R");
+        lblAverageRLoss.setText(calcAverageR('L')+"R");
+        lblAverageAdjRWin.setText(calcAverageAdjR('W')+"R");
+        lblAverageAdjRLoss.setText(calcAverageAdjR('L')+"R");
+
+    }
 
     public void setUpResultLabels(Label profFactor,Label winLoss, Label averagePercent, Label averageR,Label averageAdjR, Label winFrequency, Label result)
     {
@@ -442,10 +423,10 @@ public class CloseTradesController {
         result.setText(r + "$");
         profFactor.setText(Double.toString(calcProfitFactor()));
         winLoss.setText(Double.toString(calcWinLossRatio()));
-        double aPercent = calcAveragePercent();
-       averagePercent.setText(aPercent+"%");
-        averageR.setText(Double.toString(calcAverageR()));
-        averageAdjR.setText(Double.toString(calcAverageAdjR()));
+        double aPercent = calcAveragePercent('A'); //A = all
+        averagePercent.setText(aPercent+"%");
+        averageR.setText(calcAverageR('A')+"R");
+        averageAdjR.setText(calcAverageAdjR('A')+"R");
         double wFrequency = calcWinFrequency();
         winFrequency.setText(wFrequency + "%");
     }
@@ -453,140 +434,111 @@ public class CloseTradesController {
     public double calcResult()
     {
         double result = 0;
-            for(int i = 0; i<stats.size(); i++)
-                result = result + stats.get(i).getResult();
+        for (Stats stat : stats) result = result + stat.getResult();
         return f.formatDoubleXX(result);
     }
     public double calcProfitFactor()
     {
         double result = 0;
-            double totalWinResult = 0;
-            double totalLossResult = 0;
-            if(stats.size()>0)
-            {
-                for(Stats s: stats)
-                {
-                    double holdResult = s.getResult();
-                    if(holdResult> 0)
-                    {
-                        totalWinResult +=  holdResult;
-                    }
-                    else
-                    {
-                        totalLossResult += holdResult * -1;
-                    }
-                }
-            }
-            if(validation.notZero(totalWinResult) && validation.notZero(totalLossResult))
-                    result = f.formatDoubleXX(totalWinResult/totalLossResult);
+        double totalWinResult = stats.stream().filter(s -> s.getResult()!=0).filter(stat -> stat.getResult() > 0).mapToDouble(Stats::getResult).sum();
+        double totalLossResult = stats.stream().filter(s -> s.getResult()!=0).filter(stat -> stat.getResult() < 0).mapToDouble(Stats::getResult).sum();
+        if(validation.notZero(totalWinResult) && validation.notZero(totalLossResult))
+            result = f.formatDoubleXX(totalWinResult/totalLossResult * -1);
         return result;
     }
+
     public double calcWinLossRatio()
     {
         double result = 0;
-        double totalGain =0;
-        double totalLoss=0;
+        double avgWin =0;
+        double avgLoss=0;
         double gainCount = 0 ;
         double lossCount = 0 ;
-        for(int i = 0; i< stats.size(); i++)
-        {
-            double currentResult = stats.get(i).getResult();
-            if(currentResult>0)
-            {
-                totalGain +=  currentResult;
+        for (Stats stat : stats) {
+            double currentResult = stat.getResult();
+            if (currentResult > 0) {
+                avgWin += currentResult;
                 gainCount++;
-            }
-            else {
-                totalLoss +=  currentResult *-1;
-                lossCount ++;
+            } else {
+                avgLoss += currentResult * -1;
+                lossCount++;
             }
         }
-        if(validation.notZero(totalGain) && validation.notZero(totalLoss) && lossCount >0) {
-            totalGain = totalGain / gainCount;
-            totalLoss = totalLoss / lossCount;
-            result = f.formatDoubleXX(totalGain/totalLoss);
-            return result;
+        if(validation.notZero(avgWin) && validation.notZero(avgLoss) && lossCount >0) {
+            avgWin = avgWin / gainCount;
+            avgLoss = avgLoss / lossCount;
+            result = f.formatDoubleXX(avgWin/avgLoss);
         }
+        return result;
+    }
+//    public double calcAveragePercent(char type)
+//    {
+//        double result =0;
+//        int totalTrades =0;
+//        double holdResult;
+//        int i=0;
+//            while(i<stats.size())
+//            {
+//                holdResult = stats.get(i).getPercentResult();
+//                    result = result + holdResult;
+//                    totalTrades++;
+//                i++;
+//            }
+//        if(validation.notZero(result) && validation.notZero(totalTrades))
+//            result = f.formatDoubleXX(result /totalTrades);
+//        System.out.println(totalTrades);
+//        System.out.println(stats.size());
+//        return result;
+//    }
+    public double calcAveragePercent(char type)
+    {
+        double result =0;
+        DoubleSummaryStatistics summary;
+        if(type == 'A')
+            summary = stats.stream().collect(Collectors.summarizingDouble(Stats::getPercentResult));
+        else if(type == 'W')
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='W').collect(Collectors.summarizingDouble(Stats::getPercentResult));
         else
-            return 0;
-    }
-    public double calcAveragePercent()
-    {
-        double result =0;
-        int totalTrades =0;
-        double holdResult;
-        int i=0;
-            while(i<stats.size())
-            {
-                holdResult = stats.get(i).getPercentResult();
-                if(holdResult != 0)
-                {
-                    result = result + holdResult;
-                    totalTrades++;
-                }
-                i++;
-            }
-        if(validation.notZero(result) && validation.notZero(totalTrades))
-            result = f.formatDoubleXX(result /totalTrades);
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='L').collect(Collectors.summarizingDouble(Stats::getPercentResult));
+        if(validation.notZero(summary.getCount()))
+            result = f.formatDoubleXX(summary.getSum() / summary.getCount());
         return result;
     }
-    public double calcAverageR()
+    public double calcAverageR(char type)
     {
         double result =0;
-        int times = 0;
-        double holdResult =0;
-        int index = 0;
-        while(index<stats.size())
-        {
-            holdResult = stats.get(index).getResultR();
-            if(holdResult != 0)
-            {
-                result += holdResult;
-                times ++;
-            }
-            index++;
-        }
-        if(validation.notZero(result) && validation.notZero(times))
-                result = f.formatDoubleXX(result / times);
+        DoubleSummaryStatistics summary;
+        if(type == 'A')
+            summary = stats.stream().collect(Collectors.summarizingDouble(Stats::getResultR));
+        else if(type == 'W')
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='W').collect(Collectors.summarizingDouble(Stats::getResultR));
+        else
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='L').collect(Collectors.summarizingDouble(Stats::getResultR));
+        if(validation.notZero(summary.getCount()))
+                result = f.formatDoubleXX(summary.getSum() / summary.getCount());
         return result;
     }
-    public double calcAverageAdjR()
+    public double calcAverageAdjR(char type)
     {
         double result =0;
-        int times = 0;
-        double holdResult =0;
-        int index = 0;
-        while(index<stats.size())
-        {
-            holdResult = stats.get(index).getResultAdjR();
-            if(holdResult != 0)
-            {
-                result += holdResult;
-                times ++;
-            }
-            index++;
-        }
-        if(validation.notZero(result) && validation.notZero(times))
-            result = f.formatDoubleXX(result / times);
+        DoubleSummaryStatistics summary;
+        if(type == 'A')
+            summary = stats.stream().collect(Collectors.summarizingDouble(Stats::getResultAdjR));
+        else if(type == 'W')
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='W').collect(Collectors.summarizingDouble(Stats::getResultAdjR));
+        else
+            summary = stats.stream().filter(pos->pos.getWinLoss()=='L').collect(Collectors.summarizingDouble(Stats::getResultAdjR));
+        if(validation.notZero(summary.getCount()))
+            result = f.formatDoubleXX(summary.getSum() / summary.getCount());
         return result;
     }
     public double calcWinFrequency()
     {
         double result =0;
-        int totalTrades = 0;
-        int winCounts =0;
-            while(totalTrades <stats.size())
-            {
-                if(stats.get(totalTrades).getResult()>0)
-                {
-                    winCounts++;
-                }
-                totalTrades++;
-            }
+        int winCounts = (int) stats.stream().filter(stats -> stats.getResult() >0).count();
+        int totalTrades = stats.size();
         if(validation.notZero(totalTrades))
-        {
             result = f.formatDoubleXX(((double)winCounts/totalTrades)*100);
-        }
         return result;
     }
 }

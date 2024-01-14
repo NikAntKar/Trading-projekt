@@ -16,9 +16,9 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="475.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ConfirmWindow.ConfirmWindowController">
 
     <children>
-      <HBox layoutX="51.0" layoutY="185.0" prefHeight="55.0" prefWidth="355.0" AnchorPane.leftAnchor="51.0">
+      <HBox layoutX="51.0" layoutY="185.0" prefHeight="55.0" prefWidth="380.0" AnchorPane.leftAnchor="45.0">
          <children>
-            <TableView fx:id="tblSum" prefHeight="55.0" prefWidth="252.0">
+            <TableView fx:id="tblSum" prefHeight="55.0" prefWidth="255.0">
               <columns>
                 <TableColumn fx:id="tblTotSide" prefWidth="40.0" style="-fx-alignment: center;" text="Side" />
                 <TableColumn fx:id="tblTotUnits" prefWidth="51.0" style="-fx-alignment: center;" text="Units" />
@@ -26,7 +26,7 @@
                   <TableColumn fx:id="tblTotClosePrice" prefWidth="77.0" style="-fx-alignment: center;" text="Close price" />
               </columns>
             </TableView>
-            <TableView fx:id="tblSymbStats" prefHeight="55.0" prefWidth="106.0">
+            <TableView fx:id="tblSymbStats" prefHeight="55.0" prefWidth="120.0">
               <columns>
                 <TableColumn fx:id="tblHOD" prefWidth="50.0" style="-fx-alignment: center;" text="HOD" />
                 <TableColumn fx:id="tblLOD" prefWidth="49.0" style="-fx-alignment: center;" text="LOD" />
@@ -34,9 +34,9 @@
             </TableView>
          </children>
       </HBox>
-      <HBox layoutX="51.0" layoutY="240.0" prefHeight="125.0" prefWidth="251.0">
+      <HBox layoutX="51.0" layoutY="240.0" prefHeight="125.0" prefWidth="255.0" AnchorPane.leftAnchor="45.0">
          <children>
-            <TableView fx:id="tblAllTrades" prefHeight="164.0" prefWidth="251.0">
+            <TableView fx:id="tblAllTrades" prefHeight="125.0" prefWidth="260.0">
               <columns>
                 <TableColumn fx:id="tblTradesSide" prefWidth="50.0" style="-fx-alignment: center;" text="Side" />
                 <TableColumn fx:id="tblTradesUnits" prefWidth="54.0" style="-fx-alignment: center;" text="Units" />
@@ -46,24 +46,51 @@
             </TableView>
          </children>
       </HBox>
-      <HBox alignment="TOP_CENTER" layoutY="36.0" prefHeight="115.0" prefWidth="420.0">
+      <HBox layoutX="45.0" layoutY="92.0" prefHeight="72.0" prefWidth="366.0" AnchorPane.leftAnchor="45.0">
          <children>
-            <VBox prefHeight="131.0" prefWidth="115.0">
+            <VBox prefHeight="72.0" prefWidth="107.0">
                <children>
-                  <Label fx:id="lblSymbID" prefHeight="55.0" prefWidth="112.0" text="Symb">
-                     <font>
-                        <Font size="38.0" />
-                     </font>
-                  </Label>
                   <Label fx:id="lblStatus" text="Status">
                      <font>
-                        <Font size="21.0" />
+                        <Font size="18.0" />
                      </font>
                      <padding>
                         <Insets top="10.0" />
                      </padding>
                   </Label>
                   <Label fx:id="lblUnitsLeft" text="lblUnitsLeft">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox prefHeight="72.0" prefWidth="127.0">
+               <children>
+                  <Label fx:id="lblResultR" prefHeight="35.0" prefWidth="129.0" text="lblResultR">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="lblResultAdjr" prefHeight="35.0" prefWidth="137.0" text="lblResultAdjr">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox prefHeight="72.0" prefWidth="125.0">
+               <children>
+                  <Label fx:id="lblDolResult" prefHeight="35.0" prefWidth="118.0" text="lblDolResult">
                      <font>
                         <Font size="16.0" />
                      </font>
@@ -118,6 +145,11 @@
             </Button>
          </children>
       </VBox>
+      <Label fx:id="lblSymbID" layoutX="48.0" layoutY="37.0" prefHeight="55.0" prefWidth="120.0" text="Symb" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0">
+         <font>
+            <Font size="38.0" />
+         </font>
+      </Label>
    </children>
 
     <stylesheets>

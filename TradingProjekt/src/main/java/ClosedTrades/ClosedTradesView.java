@@ -23,19 +23,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 public class ClosedTradesView implements Initializable {
     @FXML
-    private Label lblAverageAdjR;
+    private Label lblAverageAdjR, lblAveragePercent, lblAverageR, lblProfitFactor, lblWinFrequency, lblWinLoss, lblResult;
     @FXML
-    private Label lblAveragePercent;
-    @FXML
-    private Label lblAverageR;
-    @FXML
-    private Label lblProfitFactor;
-    @FXML
-    private Label lblWinFrequency;
-    @FXML
-    private Label lblWinLoss;
-    @FXML
-    private Label lblResult;
+    private Label lblAveragePercentWin, lblAveragePercentLoss, lblAverageRWin, lblAverageRLoss, lblAverageAdjRWin, lblAverageAdjRLoss, lblBiggestRWin, lblBiggestRLoss;
     @FXML
     private BarChart<String, Integer> barChart;
     @FXML
@@ -125,5 +115,6 @@ public class ClosedTradesView implements Initializable {
         setUpAll();
         setUpCharts();
         analyse.setUpResultLabels(lblProfitFactor, lblWinLoss, lblAveragePercent, lblAverageR, lblAverageAdjR, lblWinFrequency, lblResult);
+        analyse.setUpWinLossLabels(lblAveragePercentWin, lblAveragePercentLoss, lblAverageRWin, lblAverageRLoss, lblAverageAdjRWin, lblAverageAdjRLoss, lblBiggestRWin, lblBiggestRLoss);
     }
 }

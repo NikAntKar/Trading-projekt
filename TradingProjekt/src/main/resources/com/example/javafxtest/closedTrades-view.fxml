@@ -198,7 +198,7 @@
          </children>
       </HBox>
       <Button fx:id="btnDepth" layoutX="38.0" layoutY="609.0" mnemonicParsing="false" onAction="#inDepthView" prefHeight="42.0" prefWidth="294.0" text="In depth stats" />
-      <HBox layoutX="143.0" layoutY="374.0" prefHeight="35.0" prefWidth="198.0">
+      <HBox layoutX="157.0" layoutY="374.0" prefHeight="35.0" prefWidth="198.0">
          <children>
             <Label prefHeight="35.0" prefWidth="102.0" text="Winners" textAlignment="CENTER">
                <font>
@@ -218,9 +218,9 @@
             </Label>
          </children>
       </HBox>
-      <HBox layoutX="28.0" layoutY="416.0" prefHeight="142.0" prefWidth="294.0">
+      <HBox layoutX="20.0" layoutY="416.0" prefHeight="142.0" prefWidth="302.0">
          <children>
-            <VBox prefHeight="162.0" prefWidth="127.0">
+            <VBox prefHeight="142.0" prefWidth="141.0">
                <children>
                   <Label prefHeight="35.0" prefWidth="196.0" text="Average %" textAlignment="CENTER">
                      <font>
@@ -260,7 +260,7 @@
                <children>
                   <Label fx:id="lblAveragePercentWin" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -268,7 +268,7 @@
                   </Label>
                   <Label fx:id="lblAverageRWin" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -276,7 +276,7 @@
                   </Label>
                   <Label fx:id="lblAverageAdjRWin" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -284,7 +284,7 @@
                   </Label>
                   <Label fx:id="lblBiggestRWin" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -292,11 +292,11 @@
                   </Label>
                </children>
             </VBox>
-            <VBox prefHeight="166.0" prefWidth="43.0">
+            <VBox prefHeight="142.0" prefWidth="72.0">
                <children>
-                  <Label fx:id="lblAveragePercentLoss" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
+                  <Label fx:id="lblAveragePercentLoss" prefHeight="34.0" prefWidth="74.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -304,7 +304,7 @@
                   </Label>
                   <Label fx:id="lblAverageRLoss" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
@@ -312,15 +312,15 @@
                   </Label>
                   <Label fx:id="lblAverageAdjRLoss" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
                   </Label>
-                  <Label fx:id="lblBiggestRLoss" prefHeight="38.0" prefWidth="103.0" text="? " textAlignment="CENTER">
+                  <Label fx:id="lblBiggestRLoss" prefHeight="35.0" prefWidth="72.0" text="? " textAlignment="CENTER">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="18.0" />
                      </font>
                      <opaqueInsets>
                         <Insets />

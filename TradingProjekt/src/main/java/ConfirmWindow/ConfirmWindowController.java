@@ -25,329 +25,264 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class ConfirmWindowController  implements Initializable{
+public class ConfirmWindowController  implements Initializable {
 
- public ConfirmWindowController()
- {
-   f= new FormatterClass();
+ public ConfirmWindowController() {
+  f = new FormatterClass();
  }
 
  String symb;
 
-  @FXML
-  private Button btnConfirm;
-
-  @FXML
-  private Label lblSymbID;
-
-  @FXML
-  private TableView<Trade> tblAllTrades;
-  @FXML
-  private TableView<OpenPos> tblSum;
-  @FXML
-  private TableView<OpenPos> tblSymbStats;
-  @FXML
-  private Button testKnappen()
-  {
-      return null;
-  }
-  @FXML
-  private TableColumn<OpenPos, Integer> Units;
-
-  @FXML
-  private TableColumn<Trade, String> tblTradesDate;
-  @FXML
-  private TableColumn<Trade, Double> tblTradesPrice;
-  @FXML
-  private TableColumn<Trade, Character> tblTradesSide;
-  @FXML
-  private TableColumn<Trade, Integer> tblTradesUnits;
-  @FXML
-  private TableColumn<Trade, Integer> tblTradesCUnits;
-
-  @FXML
-  private Label lblStatus;
-
-  @FXML
-  private TableColumn<OpenPos, Double> tblTotOpenPrice;
-  @FXML
-  private TableColumn<OpenPos, Double> tblTotClosePrice;
-  @FXML
-  private TableColumn<OpenPos, String> tblDate;
-
-  @FXML
-  private TableColumn<OpenPos, Double> tblHOD;
-
-  @FXML
-  private TableColumn<OpenPos, ?> tblIDPriour;
-
-  @FXML
-  private TableColumn<OpenPos, Double> tblLOD;
 
  @FXML
-  private TableColumn<OpenPos, Double> tblPrice;
+ private Label lblSymbID, lblResultR, lblResultAdjr, lblDolResult;
 
-  @FXML
-  private TableColumn<OpenPos, Character> tblTotSide;
-
-  @FXML
-  private TableColumn<OpenPos, Integer> tblTotUnits;
-  @FXML
-  private Label lblTest;
-
-
-  @FXML
-  private Label txtAdjR;
+ @FXML
+ private TableView<Trade> tblAllTrades;
+ @FXML
+ private TableView<OpenPos> tblSum;
+ @FXML
+ private TableView<OpenPos> tblSymbStats;
+ @FXML
+ private TableColumn<Trade, String> tblTradesDate;
+ @FXML
+ private TableColumn<Trade, Double> tblTradesPrice;
+ @FXML
+ private TableColumn<Trade, Character> tblTradesSide;
+ @FXML
+ private TableColumn<Trade, Integer> tblTradesUnits;
+ @FXML
+ private Label lblStatus;
+ @FXML
+ private TableColumn<OpenPos, Double> tblTotOpenPrice;
+ @FXML
+ private TableColumn<OpenPos, Double> tblTotClosePrice;
+ @FXML
+ private TableColumn<OpenPos, Double> tblHOD;
+ @FXML
+ private TableColumn<OpenPos, Double> tblLOD;
+ @FXML
+ private TableColumn<OpenPos, Character> tblTotSide;
+ @FXML
+ private TableColumn<OpenPos, Integer> tblTotUnits;
  @FXML
  private Label lblUnitsLeft;
+
  @FXML
- private Button btnBack;
+ private void minimize(MouseEvent event) {
+  topPaneActions.minimize(event);
+ }
+
  @FXML
- private Button remove;
+ private void maximize(MouseEvent event) {
+  topPaneActions.maximize(event);
+ }
+
  @FXML
-  private Label txtR;
+ private void close(MouseEvent event) {
+  topPaneActions.close(event);
+ }
+
+ @FXML
+ private void handleMoveWindowAction(MouseEvent event) {
+  topPaneActions.handleMoveWindowAction(event);
+ }
+
+ @FXML
+ private void handleMovement(MouseEvent event) {
+  topPaneActions.handleMovement(event);
+ }
 
  TopPaneActions topPaneActions = new TopPaneActions();
  private InfoWindow.ActiveController controller;
  private Stage stage;
  FormatterClass f;
  OpenPos openPos;
- ArrayList<Trade>tradeList=new ArrayList<>();
+ ArrayList<Trade> tradeList = new ArrayList<>();
  DataHolder data = DataHolder.getInstance();
  JsonFixer json = new JsonFixer();
 
 
- @FXML
- private void minimize(MouseEvent event)
- {
-  topPaneActions.minimize(event);
- }
- @FXML
- private void maximize(MouseEvent event)
- {
-  topPaneActions.maximize(event);
- }
- @FXML
- private void close(MouseEvent event)
- {
-  topPaneActions.close(event);
- }
- @FXML
- private void handleMoveWindowAction(MouseEvent event)
- {
-  topPaneActions.handleMoveWindowAction(event);
- }
- @FXML
- private void handleMovement(MouseEvent event)
- {
-  topPaneActions.handleMovement(event);
+ public void readJsonObject() {
+  openPos = json.getOneItem(symb);
  }
 
- public void readJsonObject()
- {
-   openPos = json.getOneItem(symb);
- }
-
-  public void setSymb(String symbol)
-{
+ public void setSymb(String symbol) {
   symb = symbol;
-}
-  public void setLabel()
-  {
-   lblSymbID.setText(openPos.getSymb());
-  }
-  public void setUpTradesTbl()
-  {
-  ObservableList<Trade> items = tblAllTrades.getItems();
+ }
 
+ public void setLabel() {
+  lblSymbID.setText(openPos.getSymb());
+ }
+
+ public void setUpTradesTbl() {
+  ObservableList<Trade> items = tblAllTrades.getItems();
   OpenPos o = json.getOneItem(openPos.getSymb());
-  for(int i = 0; i< openPos.getSides().size(); i++)
-   {
-     tradeList.add(new Trade(openPos.getSides().get(i), openPos.getPrice().get(i),
-             openPos.getUnits().get(i), openPos.getDate().get(i)));
-     items.add(tradeList.get(i));
-   }
+  for (int i = 0; i < openPos.getSides().size(); i++) {
+   tradeList.add(new Trade(openPos.getSides().get(i), openPos.getPrice().get(i),
+           openPos.getUnits().get(i), openPos.getDate().get(i)));
+   items.add(tradeList.get(i));
   }
- public void setUpSumTbl()
- {
+ }
+
+ public void setUpSumTbl() {
   ObservableList<OpenPos> items = tblSum.getItems();
   items.add(openPos);
  }
- public void setUpSymbTbl()
- {
+
+ public void setUpSymbTbl() {
   ObservableList<OpenPos> items = tblSymbStats.getItems();
   items.add(openPos);
  }
- public void remove()
- {
-    Trade t = tblAllTrades.getSelectionModel().getSelectedItem();
-    if(t != null)
-    {
-      int index = tblAllTrades.getItems().indexOf(t);
-      tblAllTrades.getItems().remove(index);
-      changesInTblAllTrades();
-      openPos.removeTransaction(index);
-     tradeList.remove(index);
-      json.update(openPos);
-     System.out.println(openPos.getSides());
 
-    }
-    else
-    {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("No selected item");
-      alert.setContentText("No item are selected");
-      alert.setHeaderText(null); // Optional header text
-      alert.showAndWait();
-    }
+ public void remove() {
+  Trade t = tblAllTrades.getSelectionModel().getSelectedItem();
+  if (t != null) {
+   int index = tblAllTrades.getItems().indexOf(t);
+   tblAllTrades.getItems().remove(index);
+   changesInTblAllTrades();
+   openPos.removeTransaction(index);
+   tradeList.remove(index);
+   json.update(openPos);
+   System.out.println(openPos.getSides());
+
+  } else {
+   Alert alert = new Alert(Alert.AlertType.ERROR);
+   alert.setTitle("No selected item");
+   alert.setContentText("No item are selected");
+   alert.setHeaderText(null); // Optional header text
+   alert.showAndWait();
+  }
  }
 
 
-
- public void changesInTblAllTrades()
- {
+ public void changesInTblAllTrades() {
   ArrayList<Double> holdBuys = new ArrayList<Double>();
   ArrayList<Double> holdSells = new ArrayList<Double>();
   ArrayList<Integer> holdUnitsBuy = new ArrayList<Integer>();
   ArrayList<Integer> holdUnitSell = new ArrayList<Integer>();
   int holdTotalUnitsBuy = 0;
   int holdTotalUnitsSell = 0;
-  for(int i = 0; i<tblAllTrades.getItems().size();i++)
-   {
-      if(tblAllTrades.getItems().get(i).getSide() == 'B')
-      {
-         holdBuys.add(tblAllTrades.getItems().get(i).getPrice());
-         holdUnitsBuy.add(tblAllTrades.getItems().get(i).getUnits());
-         holdTotalUnitsBuy = holdTotalUnitsBuy + tblAllTrades.getItems().get(i).getUnits();
-      }
-      else {
-       holdSells.add(tblAllTrades.getItems().get(i).getPrice());
-       holdUnitSell.add(tblAllTrades.getItems().get(i).getUnits());
-       holdTotalUnitsSell = holdTotalUnitsSell + tblAllTrades.getItems().get(i).getUnits();
-      }
+  for (int i = 0; i < tblAllTrades.getItems().size(); i++) {
+   if (tblAllTrades.getItems().get(i).getSide() == 'B') {
+    holdBuys.add(tblAllTrades.getItems().get(i).getPrice());
+    holdUnitsBuy.add(tblAllTrades.getItems().get(i).getUnits());
+    holdTotalUnitsBuy = holdTotalUnitsBuy + tblAllTrades.getItems().get(i).getUnits();
+   } else {
+    holdSells.add(tblAllTrades.getItems().get(i).getPrice());
+    holdUnitSell.add(tblAllTrades.getItems().get(i).getUnits());
+    holdTotalUnitsSell = holdTotalUnitsSell + tblAllTrades.getItems().get(i).getUnits();
    }
-  double averageBuy =0;
-  double averageSell=0;
-  int indexBuys=0;
-  int indexSells = 0;
-  for(int i = 0; i<holdBuys.size() + holdSells.size();i++)
-  {
-     if(tblAllTrades.getItems().get(i).getSide() == 'B')
-     {
-         averageBuy = averageBuy+(holdBuys.get(indexBuys) * holdUnitsBuy.get(indexBuys));
-         indexBuys++;
-     }
-     else
-     {
-           averageSell = averageSell+ (holdSells.get(indexSells) * holdUnitSell.get(indexSells));
-           indexSells++;
-      }
   }
-  averageBuy = f.formatDoubleXXX(averageBuy /holdTotalUnitsBuy);
-  averageSell = f.formatDoubleXXX(averageSell/holdTotalUnitsSell);
+  double averageBuy = 0;
+  double averageSell = 0;
+  int indexBuys = 0;
+  int indexSells = 0;
+  for (int i = 0; i < holdBuys.size() + holdSells.size(); i++) {
+   if (tblAllTrades.getItems().get(i).getSide() == 'B') {
+    averageBuy = averageBuy + (holdBuys.get(indexBuys) * holdUnitsBuy.get(indexBuys));
+    indexBuys++;
+   } else {
+    averageSell = averageSell + (holdSells.get(indexSells) * holdUnitSell.get(indexSells));
+    indexSells++;
+   }
+  }
+  averageBuy = f.formatDoubleXXX(averageBuy / holdTotalUnitsBuy);
+  averageSell = f.formatDoubleXXX(averageSell / holdTotalUnitsSell);
   tblSum.getItems().get(0).setOpenPrice(averageBuy);
   tblSum.getItems().get(0).setClosePrice(averageSell);
 
-  if(tblAllTrades.getItems().get(0).getSide() == 'B')
-    {
-     tblSum.getItems().get(0).setStartUnits(holdTotalUnitsBuy);
-     openPos.setOpenPrice(averageBuy);
-     openPos.setUnitsLeft(holdTotalUnitsBuy-holdTotalUnitsSell);
-    }
-  else
-  {
+  if (tblAllTrades.getItems().get(0).getSide() == 'B') {
+   tblSum.getItems().get(0).setStartUnits(holdTotalUnitsBuy);
+   openPos.setOpenPrice(averageBuy);
+   openPos.setUnitsLeft(holdTotalUnitsBuy - holdTotalUnitsSell);
+  } else {
    tblSum.getItems().get(0).setStartUnits(holdTotalUnitsSell);
    openPos.setOpenPrice(averageSell);
-   openPos.setUnitsLeft(holdTotalUnitsSell-holdTotalUnitsBuy);
+   openPos.setUnitsLeft(holdTotalUnitsSell - holdTotalUnitsBuy);
   }
+
   setStatusLabels();
   tblSum.refresh();
  }
- public void setParentController(InfoWindow.ActiveController controller)
- {
-     this.controller = controller;
+
+ public void setParentController(InfoWindow.ActiveController controller) {
+  this.controller = controller;
  }
 
-  public void confirm(ActionEvent actionEvent) throws IOException
-  {
-   ArrayList<Character> holdSide = new ArrayList<>();
-   ArrayList<Integer> holdUnits = new ArrayList<>();
-   ArrayList<Double> holdPrice = new ArrayList<>();
-   ArrayList<String> holdDate = new ArrayList<>();
-   System.out.println("sides 3 " + openPos.getSides());
-   int newUnits =0;
-   for (int i = 0; i<tradeList.size();i++)
-   {
-    holdSide.add(tradeList.get(i).getSide());
-    holdUnits.add(tradeList.get(i).getUnits());
-    holdPrice.add((tradeList.get(i).getPrice()));
-    holdDate.add((tradeList.get(i).getDate()));
-    if(holdSide.get(i).equals('B'))
-      newUnits = newUnits + tradeList.get(i).getUnits();
-    else
-      newUnits = newUnits - tradeList.get(i).getUnits();
-   }
-   openPos.setUnitsLeft(newUnits);
-   openPos.setSides(holdSide);
-   openPos.setUnits(holdUnits);
-   openPos.setPrice(holdPrice);
-   openPos.setDate(holdDate);
-   openPos.setThirdSell(newUnits/3);
-   double risk = 0;
-   if(openPos.getSide() =='B')
-   {
-    if(openPos.getOpenPrice() > openPos.getStop()) {
-     risk = openPos.getOpenPrice() - openPos.getStop();
-     openPos.setThreR(f.formatDoubleXX((risk * 3) + openPos.getOpenPrice()));
-     openPos.setSixR(f.formatDoubleXX((risk * 6) + openPos.getOpenPrice()));
-     openPos.setNineR(f.formatDoubleXX((risk * 9) + openPos.getOpenPrice()));
-    }
-   }
+ public void confirm(ActionEvent actionEvent) throws IOException {
+  ArrayList<Character> holdSide = new ArrayList<>();
+  ArrayList<Integer> holdUnits = new ArrayList<>();
+  ArrayList<Double> holdPrice = new ArrayList<>();
+  ArrayList<String> holdDate = new ArrayList<>();
+  int newUnits = 0;
+  for (int i = 0; i < tradeList.size(); i++) {
+   holdSide.add(tradeList.get(i).getSide());
+   holdUnits.add(tradeList.get(i).getUnits());
+   holdPrice.add((tradeList.get(i).getPrice()));
+   holdDate.add((tradeList.get(i).getDate()));
+   if (holdSide.get(i).equals('B'))
+    newUnits = newUnits + tradeList.get(i).getUnits();
    else
-   {
-    if(openPos.getOpenPrice() < openPos.getStop())
-      {
-       risk = openPos.getStop() - openPos.getOpenPrice() ;
-       openPos.setThreR(f.formatDoubleXX(openPos.getOpenPrice() - (risk * 3)));
-       openPos.setSixR(f.formatDoubleXX(openPos.getOpenPrice() -(risk * 6)));
-       openPos.setNineR(f.formatDoubleXX(openPos.getOpenPrice() -(risk * 9)));
-      }
-   }
-   json.update(openPos);
-   data.setOpenPos(openPos);
-   //  Back to main
-   stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
-   stage.close();
-
-   if(openPos.getUnitsLeft() == 0)
-   {
-     json.remove(openPos);
-     ClosedTradesView closedTrade = new ClosedTradesView();
-     closedTrade.setUpAll();
-     closedTrade.addNewItems(openPos);
-   }
-   controller.setBackResult();
-   //FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/javafxtest/openpositions-view.fxml"));
-   //Object root = loader.load();
-   //stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
-   //Scene scene = new Scene((Parent) root, 860, 680);
-   //stage.setScene(scene);
-   //stage.show();
-   }
-
-  public void addToTables()
-  {
-     setUpSumTbl();
-     setUpTradesTbl();
+    newUnits = newUnits - tradeList.get(i).getUnits();
   }
+  openPos.setUnitsLeft(newUnits);
+  openPos.setSides(holdSide);
+  openPos.setUnits(holdUnits);
+  openPos.setPrice(holdPrice);
+  openPos.setDate(holdDate);
+  openPos.setThirdSell(newUnits / 3);
+  double risk = 0;
+  if (openPos.getSide() == 'B') {
+   if (openPos.getOpenPrice() > openPos.getStop()) {
+    risk = openPos.getOpenPrice() - openPos.getStop();
+    openPos.setThreR(f.formatDoubleXX((risk * 3) + openPos.getOpenPrice()));
+    openPos.setSixR(f.formatDoubleXX((risk * 6) + openPos.getOpenPrice()));
+    openPos.setNineR(f.formatDoubleXX((risk * 9) + openPos.getOpenPrice()));
+   }
+  } else {
+   if (openPos.getOpenPrice() < openPos.getStop()) {
+    risk = openPos.getStop() - openPos.getOpenPrice();
+    openPos.setThreR(f.formatDoubleXX(openPos.getOpenPrice() - (risk * 3)));
+    openPos.setSixR(f.formatDoubleXX(openPos.getOpenPrice() - (risk * 6)));
+    openPos.setNineR(f.formatDoubleXX(openPos.getOpenPrice() - (risk * 9)));
+   }
+  }
+  json.update(openPos);
+  data.setOpenPos(openPos);
+  //  Back to main
+  stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+  stage.close();
 
- private ObservableList<OpenPos>tblSum(){
+  if (openPos.getUnitsLeft() == 0) {
+   json.remove(openPos);
+   ClosedTradesView closedTrade = new ClosedTradesView();
+   closedTrade.setUpAll();
+   closedTrade.addNewItems(openPos);
+  }
+  controller.setBackResult();
+  //FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/javafxtest/openpositions-view.fxml"));
+  //Object root = loader.load();
+  //stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+  //Scene scene = new Scene((Parent) root, 860, 680);
+  //stage.setScene(scene);
+  //stage.show();
+ }
+
+ public void addToTables() {
+  setUpSumTbl();
+  setUpTradesTbl();
+ }
+
+ private ObservableList<OpenPos> tblSum() {
   return FXCollections.observableArrayList();
  }
- private ObservableList<Trade>tblAllTrades(){
+
+ private ObservableList<Trade> tblAllTrades() {
   return FXCollections.observableArrayList();
  }
- private ObservableList<OpenPos>tblSymbStats(){
+
+ private ObservableList<OpenPos> tblSymbStats() {
   return FXCollections.observableArrayList();
  }
 
@@ -445,23 +380,36 @@ public class ConfirmWindowController  implements Initializable{
   addToTables();
   setUpSymbTbl();
   setStatusLabels();
+  setLabelResult();
+ }
+
+ public void setLabelResult() {
+  double result;
+  if(openPos.getSide() =='B')
+     result = f.formatDoubleXX((openPos.getClosePrice() * openPos.getStartUnits()) - (openPos.getOpenPrice() * openPos.getStartUnits()));
+  else
+     result = f.formatDoubleXX((openPos.getOpenPrice() * openPos.getStartUnits()) - (openPos.getClosePrice() * openPos.getStartUnits()));
+  double rResult = f.formatDoubleXX(result / openPos.getCurrentR());
+  double adjResultR = f.formatDoubleXX(result / (openPos.getCalcAdjR()*openPos.getCurrentR()));
+  lblDolResult.setText("Result $ " + result);
+  lblResultR.setText("Result R: " + rResult);
+  lblResultAdjr.setText("Result adjR " + adjResultR);
 
  }
 
- public void setStatusLabels()
- {
-     for(int i = 0; i< openPos.getSide();i++)
-      if(openPos.getUnitsLeft()==0)
-      {
-       lblStatus.setText("CLOSED");
-       lblUnitsLeft.setVisible(false);
-      }
-     else
-      {
-       lblStatus.setText ("OPEN");
-       lblUnitsLeft.setText("Units left: "+ openPos.getUnitsLeft());
-       lblUnitsLeft.setVisible(true);
-      }
+ public void setStatusLabels() {
+  if (openPos.getUnitsLeft() == 0) {
+   lblStatus.setText("CLOSED");
+   lblUnitsLeft.setVisible(false);
+  } else {
+   lblStatus.setText("OPEN");
+   lblUnitsLeft.setText("Units left: " + openPos.getUnitsLeft());
+   lblUnitsLeft.setVisible(true);
+  }
  }
 }
+
+
+
+
 
