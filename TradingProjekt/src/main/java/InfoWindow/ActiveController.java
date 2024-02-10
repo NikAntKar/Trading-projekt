@@ -294,14 +294,13 @@ public class ActiveController implements Initializable {
                     i++;
                 }
             }
-                if (existsInTblInterest && !existsInTblOpenPos) {
+                if(existsInTblInterest && !existsInTblOpenPos) {
                 openPosTblView.HandleAddNewPosExisting(tblOpen, interestTblView.getPotentialPos().get(foundAtInterestTbl),
                         priceF, tickerF, stopF, unitsF, dateColumn, side, lblAdjr);
             } else if(!existsInTblInterest && !existsInTblOpenPos){
                     openPosTblView.HandleAddNewPosNew(tblOpen, tickerF, priceF, stopF, unitsF, dateColumn, side, lblAdjr);
             }
-            if(existsInTblOpenPos)
-            {
+            if(existsInTblOpenPos){
                 openPosTblView.HandleAddToOpenPos(tblOpen, openPosTblView.getOpenPos().get(foundAtOpenPosTbl), priceF,tickerF, stopF, unitsF, dateColumn, side);
             }
             setUpOpenPositionsInfo();
@@ -329,8 +328,7 @@ public class ActiveController implements Initializable {
     }
     public void addToExecuteOpenPosition() {
         tblOpen.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
-            {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 openPosTblView.HandleExistingPos(tblOpen, cbSymb, priceFieldOPos, unitsFieldsOpenP, dateColumnOPos,
                         lblSymbOp, lblUnitsOp, lblPriceOp, lblDateOp, tglBuyOP, tglSellOP, btnExecuteOP);
         }});
@@ -408,7 +406,6 @@ public class ActiveController implements Initializable {
     }
     public void handleEditInOpenPosTbl(TableColumn.CellEditEvent<OpenPos, Double> event)
     {
-        TableColumn<OpenPos, Double> eventColumn = event.getTableColumn();
         openPosTblView.handleEditStop(event, tblOpen);
         setUpOpenPositionsInfo();
     }
@@ -416,14 +413,13 @@ public class ActiveController implements Initializable {
     public void handleLabels()
     {
         //interestTblView.handleLabelsActions(tblOpen, lbl3RTarget, lblMaxUnits, lblMinUnits, tglBuy,
-          //      riskCalculator.getRisk(), tickerField, priceField, unitsField, stopField, lblExists, lblNewRisk);
+          //riskCalculator.getRisk(), tickerField, priceField, unitsField, stopField, lblExists, lblNewRisk);
     }
     public void setBackResult()
     {
         JsonFixer json = new JsonFixer();
         int size = tblOpen.getItems().size();
-        for(int i =0; i<size; i++)
-        {
+        for(int i =0; i<size; i++){
             tblOpen.getItems().remove(0);
         }
         json.loadToView(tblOpen);
@@ -461,7 +457,7 @@ public class ActiveController implements Initializable {
             if (!newValue) {
                 // At least one of the text fields lost focus, perform the logic
                 interestTblView.handleUnitsField(tblOpen, tickerField, priceField, stopField, unitsField, lblNewRisk, tglBuy,
-                                                 lbl3RTarget, lblMaxUnits, lblMinUnits, lblExists, iconRisk);
+                                                 lbl3RTarget, lblMaxUnits, lblMinUnits, lblExists, iconRisk, riskCalculator.getRisk());
             }
         };
 

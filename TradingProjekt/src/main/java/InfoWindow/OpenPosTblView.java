@@ -292,17 +292,34 @@ public class OpenPosTblView extends TableView<OpenPos> {
     {
         OpenPos item = event.getRowValue();
         String symb = item.getSymb();
-        OpenPos o = openPos.stream().filter(pos -> pos.getSymb().equals(symb)).findAny().orElse(null);
+        OpenPos o = tblOpenPos.getItems().stream().filter(pos -> pos.getSymb().equals(symb)).findFirst().orElse(null);
         double newStop = event.getNewValue();
+        o.setStop(newStop);
         double worstCase = f.formatDoubleXX(handleWorstCase(o));
         o.setWorstCase(worstCase);
-        item.setWorstCase(worstCase);
-        o.setStop(newStop);
-        item.setStop(newStop);
         o.setOpenR(handleOpenR(o));
-        item.setOpenR(handleOpenR(o));
-        jsonFixer.update(o);
         tblOpenPos.refresh();
+        jsonFixer.update(o);
+        System.out.println(o.getSymb());
+        System.out.println(o.getStop() + " current stop");
+        System.out.println(o.getCurrentPrice() + " current price");
+    }
+    public void refresh(TableView<OpenPos> tblOpenPos)
+    {
+        ApiCall apiCall = new ApiCall();
+        double currentPrice;
+        int size = tblOpenPos.getItems().size();
+        for(int i = 0; i< size;i++)
+        {
+            String symb = tblOpenPos.getItems().get(i).getSymb();
+            OpenPos o = tblOpenPos.getItems().stream().filter(pos -> pos.getSymb().equals(symb)).findFirst().orElse(null);
+            currentPrice = apiCall.GetCurrentPrice(symb);
+            o.setCurrentPrice(f.formatDoubleXXX(currentPrice));
+            o.setWorstCase(handleWorstCase(o));
+            o.setOpenR(handleOpenR(o));
+            tblOpenPos.refresh();
+            jsonFixer.update(o);
+        }
     }
     public double handleWorstCase(OpenPos o)
     {
@@ -324,23 +341,7 @@ public class OpenPosTblView extends TableView<OpenPos> {
             openR = f.formatDoubleXX((o.getOpenPrice() - o.getCurrentPrice()) / o.getRisk());
         return openR;
     }
-    public void refresh(TableView<OpenPos> tblOpenPos)
-    {
-        ApiCall apiCall = new ApiCall();
-        double currentPrice;
-        int size = tblOpenPos.getItems().size();
-        for(int i = 0; i< size;i++)
-        {
-            String symb = tblOpenPos.getItems().get(i).getSymb();
-            OpenPos o = tblOpenPos.getItems().stream().filter(pos -> pos.getSymb().equals(symb)).findFirst().orElse(null);
-            currentPrice = apiCall.GetCurrentPrice(symb);
-            o.setCurrentPrice(f.formatDoubleXXX(currentPrice));
-            o.setWorstCase(handleWorstCase(o));
-            o.setOpenR(handleOpenR(o));
-            tblOpenPos.refresh();
-            jsonFixer.update(o);
-        }
-    }
+
 
     public void handleOpenConfirmWindow( TableView<OpenPos> tblOpen, ActiveController controller)throws IOException
     {
