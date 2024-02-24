@@ -3,6 +3,8 @@ import Analyse.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 public class MyJDBC {
 
@@ -181,6 +183,33 @@ public class MyJDBC {
         }
         return r;
     }
+    public LinkedHashMap<String,Double> getLinkedHashMapOfResult(String query)
+    {
+        LinkedHashMap<String,Double> holdValue = new LinkedHashMap<>();
+        try{
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            double result;
+            String date;
+            while(rs.next()){
+                result = rs.getDouble("dolProfit");
+                date = rs.getString("date");
+                    if (holdValue.containsKey(date)) {
+                        result += holdValue.get(date);
+                    }
+                System.out.println(date);
+                //holdValue.put(rs.getString("date").toString(), rs.getDouble("dolProfit"));
+                holdValue.put(date, result);
+            }
+            statement.close();
+            rs.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return holdValue;
+    }
+
     public ArrayList<Stats> getTopStats(String query)
     {
         ArrayList<Stats> s = new ArrayList<>();

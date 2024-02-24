@@ -1,8 +1,6 @@
 package ClosedTrades;
 import Analyse.CloseTradesController;
-import ConfirmWindow.DataHolder;
 import InfoWindow.OpenPos;
-import com.example.javafxtest.JsonFixer;
 import com.example.javafxtest.TopPaneActions;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +21,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 public class ClosedTradesView implements Initializable {
     @FXML
-    private Label lblAverageAdjR, lblAveragePercent, lblAverageR, lblProfitFactor, lblWinFrequency, lblWinLoss, lblResult;
+    private Label lblAverageAdjR, lblAveragePercent, lblAverageR, lblProfitFactor, lblWinFrequency, lblWinLoss, lblResult, lblPercentResult, lblMaxDrawdown;
     @FXML
     private Label lblAveragePercentWin, lblAveragePercentLoss, lblAverageRWin, lblAverageRLoss, lblAverageAdjRWin, lblAverageAdjRLoss, lblBiggestRWin, lblBiggestRLoss;
     @FXML
@@ -85,9 +83,7 @@ public class ClosedTradesView implements Initializable {
         analyse.setUpRiskInfoFromDb();
     }
 
-    public void setUpCharts()
-    {
-
+    public void setUpCharts() {
         analyse.setUpChart(lineChart);
         analyse.setUpBarChart(barChart);
     }
@@ -99,7 +95,7 @@ public class ClosedTradesView implements Initializable {
         stage.setScene(scene);
         stage.show();
     }
-    public void switchScene(ActionEvent actionEvent) throws IOException {
+    public void switchToHomeScene(ActionEvent actionEvent) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/com/example/javafxtest/openPositions-view.fxml"));
         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene( root, 860, 680);
@@ -114,7 +110,7 @@ public class ClosedTradesView implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setUpAll();
         setUpCharts();
-        analyse.setUpResultLabels(lblProfitFactor, lblWinLoss, lblAveragePercent, lblAverageR, lblAverageAdjR, lblWinFrequency, lblResult);
+        analyse.setUpResultLabels(lblProfitFactor, lblWinLoss, lblAveragePercent, lblAverageR, lblAverageAdjR, lblWinFrequency, lblResult, lblPercentResult, lblMaxDrawdown);
         analyse.setUpWinLossLabels(lblAveragePercentWin, lblAveragePercentLoss, lblAverageRWin, lblAverageRLoss, lblAverageAdjRWin, lblAverageAdjRLoss, lblBiggestRWin, lblBiggestRLoss);
     }
 }

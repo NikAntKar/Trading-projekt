@@ -6,6 +6,7 @@ import Analyse.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 public class DatabaseController {
 
@@ -174,6 +175,12 @@ public class DatabaseController {
             throw new RuntimeException(ex);
         }
     }
+    public LinkedHashMap<String,Double> getAllDolResultLinked(){
+      String query = "select date, dolProfit, symb from trades_schema.market_at_entry \n" +
+              "join trades_schema.stats on market_at_entry.idm_a_e = stats.idMarket\n" +
+              "order by date;";
+      return database.getLinkedHashMapOfResult(query);
+    }
 
     public Risk getRiskForStats(int id)
     {
@@ -259,6 +266,11 @@ public class DatabaseController {
         }
         return result;
     }
+    public double getMaxDrawdown()
+    {
+        String query = "Select max(drawdown) from portfolio";
+        return database.getDoubleValue(query);
+    }
     public double getPortfolioMaxValue()
     {
         double result = 0;
@@ -271,6 +283,14 @@ public class DatabaseController {
             return result;
 
     }
+    public double getMaxMinR(String type){
+        String query;
+        if (type.equals("MAX"))
+            query = "Select max(ProfitR) from stats";
+        else
+            query = "Select min(ProfitR) from stats";
+        return database.getDoubleValue(query);
+    }
     public double getPortFolioCurrentValue()
     {
         double result = 0;
@@ -281,6 +301,11 @@ public class DatabaseController {
             result = database.getDoubleValue(query);
         }
         return result;
+    }
+    public double getStartValue()
+    {
+        String query = "select value from portfolio order by idportfolio asc limit 1";
+        return database.getDoubleValue(query);
     }
 }
 

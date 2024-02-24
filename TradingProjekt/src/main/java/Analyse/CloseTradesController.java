@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class CloseTradesController {
@@ -33,26 +35,31 @@ public class CloseTradesController {
     ArrayList<Trades> trades = new ArrayList<>();
     ArrayList<Portfolio> portfolios = new ArrayList<>();
     ArrayList<Risk> risk = new ArrayList<>();
-    DatabaseController controller = new DatabaseController();
+    DatabaseController database = new DatabaseController();
 
-    public void setUpPortfolioFromDb(){portfolios = controller.readPortfolioInfo();}
+    public void setUpPortfolioFromDb() {
+        portfolios = database.readPortfolioInfo();
+    }
 
     public void setUpStatsFromDb() {
-        stats = controller.readStats();
+        stats = database.readStats();
     }
 
     public void setUpTradesFromDb() {
-        trades = controller.readTrades();
+        trades = database.readTrades();
     }
 
     public void setUpSymbStatsFromDb() {
-        symbStats = controller.readSymbStat();
+        symbStats = database.readSymbStat();
     }
 
     public void setUpMarketInfoFromDb() {
-        marketInfo = controller.readMarketInfo();
+        marketInfo = database.readMarketInfo();
     }
-    public void setUpRiskInfoFromDb(){ risk = controller.readRiskInfo();}
+
+    public void setUpRiskInfoFromDb() {
+        risk = database.readRiskInfo();
+    }
 
 
     public void setUpStops(OpenPos o) {
@@ -70,7 +77,7 @@ public class CloseTradesController {
         LocalDate parseDate = LocalDate.parse(date);
         LocalDate currentDate = LocalDate.now();
         if (size != 0) {
-            lastValue = symbStats.get(size - 1).getId()+1;
+            lastValue = symbStats.get(size - 1).getId() + 1;
             m.setId(lastValue);
         } else {
             m.setId(1);
@@ -129,14 +136,15 @@ public class CloseTradesController {
             m.setIwmOver20(true);
         m.setIwmAtrDistk(f.formatDoubleXX(((iPrice - iTen) / iTen) * 100));
         marketInfo.add(m);
-        controller.insertMarketInfo(m);
+        database.insertMarketInfo(m);
     }
+
     public void addStatsToTb(OpenPos o) {
         Stats s = new Stats();
         int size = stats.size();
         int lastValue;
         if (size != 0) {
-            lastValue = stats.get(size - 1).getId()+1;
+            lastValue = stats.get(size - 1).getId() + 1;
             s.setId(lastValue);
         } else {
             s.setId(1);
@@ -150,7 +158,7 @@ public class CloseTradesController {
         String month = getMonth(openDate);
         int holdDays = calcHoldTime(openDate, closeDate) - 1;
         for (int i = 0; i < o.getUnits().size(); i++) {
-            if(o.getSideAtindex(i)=='B')
+            if (o.getSideAtindex(i) == 'B')
                 totalUnits += o.getUnitsAtIndex(i);
         }
         if (o.getSide() == 'B') {
@@ -168,14 +176,14 @@ public class CloseTradesController {
             }
             result = f.formatDoubleXX((o.getOpenPrice() - o.getClosePrice()) * totalUnits);
         }
-        double adjDolRik = o.getCurrentR()* o.getCalcAdjR();
+        double adjDolRik = o.getCurrentR() * o.getCalcAdjR();
         double adjRResult = f.formatDoubleXX((result / adjDolRik));
         double rResult = f.formatDoubleXX(result / o.getCurrentR());
         double percentResult = f.formatDoubleXXX(((o.getClosePrice() - o.getOpenPrice()) / o.getOpenPrice()) * 100);
         Stats st = new Stats(s.getId(), o.getSymb(), wl, o.getSide(), o.getOpenPrice(), o.getClosePrice(), result, percentResult, rResult, adjRResult,
                 dayOfWeek, month, holdDays);
         stats.add(st);
-        controller.insertStats(st, openDate);
+        database.insertStats(st, openDate);
     }
 
     public void addStatsToDb(OpenPos o) {
@@ -203,16 +211,16 @@ public class CloseTradesController {
         s.setAtrToMa20(f.formatDoubleXX((ma20 - openPrice) / o.getAtr()));
         s.setAvgDolVol(f.formatDoubleXXXX(apicall.GetAvgDolVol(o.getSymb(), openDate)));
         symbStats.add(s);
-        controller.insertSymbStats(s);
+        database.insertSymbStats(s);
     }
 
     public void addTradesToDb(OpenPos o) {
         for (int i = 0; i < o.getPrice().size(); i++) {
             Trades t = new Trades();
             int size = trades.size();
-            int lastValue =0;
+            int lastValue = 0;
             if (size != 0) {
-                lastValue = trades.get(size - 1).getId()+1;
+                lastValue = trades.get(size - 1).getId() + 1;
                 t.setId(lastValue);
             } else {
                 t.setId(1);
@@ -223,71 +231,66 @@ public class CloseTradesController {
             t.setUnits(o.getUnitsAtIndex(i));
             t.setStatsID(stats.get(stats.size() - 1).getId());
             trades.add(t);
-            controller.insertTrade(t);
+            database.insertTrade(t);
         }
     }
 
 
-    public void addPortFolioToDb(OpenPos openPos)
-    {
+    public void addPortFolioToDb(OpenPos openPos) {
         Portfolio p = new Portfolio();
         int size = portfolios.size();
-        int lastValue ;
+        int lastValue;
         if (size != 0) {
-            lastValue = portfolios.get(size - 1).getId()+1;
+            lastValue = portfolios.get(size - 1).getId() + 1;
             p.setId(lastValue);
         } else {
             p.setId(1);
         }
         int dateSize = openPos.getDate().size();
         int statsSize = stats.size();
-        String date = openPos.getDateAtIndex(dateSize-1);
+        String date = openPos.getDateAtIndex(dateSize - 1);
         double value;
-        if(!portfolios.isEmpty())
-        {
-            value = f.formatDoubleXX((portfolios.get(size-1).getValue()) + (stats.get(statsSize-1).getResult()));
-        }
-        else
-            value = 3000 + stats.get(statsSize-1).getResult();
+        if (!portfolios.isEmpty()) {
+            value = f.formatDoubleXX((portfolios.get(size - 1).getValue()) + (stats.get(statsSize - 1).getResult()));
+        } else
+            value = 3000 + stats.get(statsSize - 1).getResult();
 
-        double result = stats.get(statsSize-1).getResult();
-        double drawdown =0;
-        double tenAvg = f.formatDoubleXX(controller.getMa10());
-        double twentyAvg = f.formatDoubleXX(controller.getMa20());
-        double maxValue = controller.getPortfolioMaxValue();
-        if(maxValue> value )
-            drawdown = f.formatDoubleXX(((maxValue- value)/maxValue)*100);
+        double result = stats.get(statsSize - 1).getResult();
+        double drawdown = 0;
+        double tenAvg = f.formatDoubleXX(database.getMa10());
+        double twentyAvg = f.formatDoubleXX(database.getMa20());
+        double maxValue = database.getPortfolioMaxValue();
+        if (maxValue > value)
+            drawdown = f.formatDoubleXX(((maxValue - value) / maxValue) * 100);
         p.setDate(date);
         p.setDrawdown(drawdown);
         p.setValue(value);
         p.setResult(result);
         p.setTenAvg(tenAvg);
         p.setTwentyAvg(twentyAvg);
-        p.setIdStats(controller.getIdStats());
+        p.setIdStats(database.getIdStats());
         portfolios.add(p);
-        controller.insertPortfolio(p);
+        database.insertPortfolio(p);
     }
 
-    public void addRiskToDb(OpenPos openpos)
-    {
+    public void addRiskToDb(OpenPos openpos) {
         Risk r = new Risk();
         int size = risk.size();
         int lastValue;
         if (size != 0) {
-            lastValue = risk.get(size - 1).getIdRisk()+1;
+            lastValue = risk.get(size - 1).getIdRisk() + 1;
             r.setIdRisk(lastValue);
         } else {
             r.setIdRisk(1);
         }
-        double oneR =f.formatDoubleXX(openpos.getCurrentR());
+        double oneR = f.formatDoubleXX(openpos.getCurrentR());
         double dolRisk = openpos.getTotalRisk();
         double riskPerUnits = openpos.getRisk();
         double rTaken = openpos.getTakenR();
-        double adjR =openpos.getCalcAdjR();
+        double adjR = openpos.getCalcAdjR();
         boolean insideR = true;
         double idStats = 0;
-        if(rTaken > adjR+0.5 || rTaken < adjR -0.25)
-        {
+        if (rTaken > adjR + 0.5 || rTaken < adjR - 0.25) {
             insideR = false;
         }
         r.setAdjR(adjR);
@@ -296,8 +299,8 @@ public class CloseTradesController {
         r.setInsideR(insideR);
         r.setRiskPerUnits(riskPerUnits);
         r.setRTaken(rTaken);
-        r.setIdStats(controller.getIdStats());
-        controller.insertRisk(r);
+        r.setIdStats(database.getIdStats());
+        database.insertRisk(r);
     }
 
 
@@ -344,18 +347,23 @@ public class CloseTradesController {
         return holdTime;
     }
 
-    public void setUpChart(LineChart<String, Double> chart)
-    {
+    public void setUpChart(LineChart<String, Double> chart) {
         chart.setCreateSymbols(false);
-        double result =0;
+        double result = 0;
         XYChart.Series mainSerie = new XYChart.Series<>();
-        for(int i = 0; i<stats.size(); i++)
-        {
-            result = result + stats.get(i).getResult();
-            String value = String.valueOf(i);
+        LinkedHashMap<String, Double> listOfResult = new LinkedHashMap<>();
+        listOfResult = database.getAllDolResultLinked();
+
+
+        for (String key : listOfResult.keySet()) {
+            result += listOfResult.get(key);
+            String value = String.valueOf(key);
             mainSerie.getData().add(new XYChart.Data<>(value, result));
         }
         chart.getData().add(mainSerie);
+        for (int i = 0; i < stats.size(); i++)
+            System.out.println(stats.get(i).getResult() + "    " + stats.get(i).getSymb());
+    }
 //        XYChart.Series fiveDayMA = new XYChart.Series<>();
 //        for(int i = 0; i<stats.size(); i++)
 //        {
@@ -367,7 +375,7 @@ public class CloseTradesController {
 //            i++;
 //        }
 //        chart.getData().add(fiveDayMA);
-    }
+
 
     public void setUpBarChart(BarChart<String, Integer> barChart) {
         String[] r = {"<-5R", "-4R","-3R","-2R","-1R","0R","1R","2R","3R","4R","5R","6R","7R","8R","9R",">10R"};
@@ -414,10 +422,14 @@ public class CloseTradesController {
         lblAverageRLoss.setText(calcAverageR('L')+"R");
         lblAverageAdjRWin.setText(calcAverageAdjR('W')+"R");
         lblAverageAdjRLoss.setText(calcAverageAdjR('L')+"R");
+        lblBiggestRWin.setText(calcMaxMinR("MAX")+"R");
+        lblBiggestRLoss.setText(calcMaxMinR("MIN")+"R");
 
     }
 
-    public void setUpResultLabels(Label profFactor,Label winLoss, Label averagePercent, Label averageR,Label averageAdjR, Label winFrequency, Label result)
+    public void setUpResultLabels(Label profFactor,Label winLoss, Label averagePercent, Label averageR,
+                                  Label averageAdjR, Label winFrequency, Label result, Label totalPercentResult,
+                                  Label maxDrawdown)
     {
         String r = (Double.toString(calcResult()));
         result.setText(r + "$");
@@ -429,6 +441,9 @@ public class CloseTradesController {
         averageAdjR.setText(calcAverageAdjR('A')+"R");
         double wFrequency = calcWinFrequency();
         winFrequency.setText(wFrequency + "%");
+        totalPercentResult.setText(totalPercentResult() +"%");
+        maxDrawdown.setText("-" +calcMaxDrawDown() + "%");
+
     }
 
     public double calcResult()
@@ -445,6 +460,9 @@ public class CloseTradesController {
         if(validation.notZero(totalWinResult) && validation.notZero(totalLossResult))
             result = f.formatDoubleXX(totalWinResult/totalLossResult * -1);
         return result;
+    }
+    public double calcMaxMinR(String type){
+        return database.getMaxMinR(type);
     }
 
     public double calcWinLossRatio()
@@ -471,25 +489,14 @@ public class CloseTradesController {
         }
         return result;
     }
-//    public double calcAveragePercent(char type)
-//    {
-//        double result =0;
-//        int totalTrades =0;
-//        double holdResult;
-//        int i=0;
-//            while(i<stats.size())
-//            {
-//                holdResult = stats.get(i).getPercentResult();
-//                    result = result + holdResult;
-//                    totalTrades++;
-//                i++;
-//            }
-//        if(validation.notZero(result) && validation.notZero(totalTrades))
-//            result = f.formatDoubleXX(result /totalTrades);
-//        System.out.println(totalTrades);
-//        System.out.println(stats.size());
-//        return result;
-//    }
+    public double totalPercentResult()
+    {
+        double currentValue = database.getPortFolioCurrentValue();
+        double startValue = database.getStartValue();
+        if(startValue != 0|| currentValue != 0)
+            return f.formatDoubleXX(((currentValue-startValue)/startValue)*100);
+        return 0;
+    }
     public double calcAveragePercent(char type)
     {
         double result =0;
@@ -531,6 +538,10 @@ public class CloseTradesController {
         if(validation.notZero(summary.getCount()))
             result = f.formatDoubleXX(summary.getSum() / summary.getCount());
         return result;
+    }
+    public double calcMaxDrawDown()
+    {
+        return database.getMaxDrawdown();
     }
     public double calcWinFrequency()
     {

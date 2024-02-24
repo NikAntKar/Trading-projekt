@@ -18,6 +18,7 @@ public class RiskCalculator {
 
     int id;
     double risk;
+    DatabaseController database = new DatabaseController();
     double score;
     double marketMaScore;
     double marketAtrScore;
@@ -63,7 +64,6 @@ public class RiskCalculator {
             risk= 0.25;
         String riskString = String.valueOf(risk);
         lblAdjR.setText(riskString + "%");
-
     }
 
     public void setUpOpenPosScore(TableView<OpenPos> o){
@@ -86,7 +86,6 @@ public class RiskCalculator {
 
     public void setUpPortfolioScore() {
         portfolioScore =0;
-        DatabaseController database = new DatabaseController();
         double ma10 = database.getMa10();
         double ma20 = database.getMa20();
         double currentPrice= database.getPortFolioCurrentValue();
@@ -110,11 +109,11 @@ public class RiskCalculator {
                                  Circle iconSpyma10, Circle iconSpyma20, Circle iconSpy10Over20,
                                  Circle iconIWMma10, Circle iconIwmma20, Circle iconIwm10Over20)
     {
-        processSymbol("qqq", iconQqqma10, iconQqqma20, iconQqq10Over20, lblQQQ);
-        processSymbol("spy", iconSpyma10, iconSpyma20, iconSpy10Over20, lblSPY);
-        processSymbol("iwm", iconIWMma10, iconIwmma20, iconIwm10Over20, lblIWM);
+        processMarketActions("qqq", iconQqqma10, iconQqqma20, iconQqq10Over20, lblQQQ);
+        processMarketActions("spy", iconSpyma10, iconSpyma20, iconSpy10Over20, lblSPY);
+        processMarketActions("iwm", iconIWMma10, iconIwmma20, iconIwm10Over20, lblIWM);
     }
-    private void processSymbol(String symbol, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle, Label label) {
+    private void processMarketActions(String symbol, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle, Label label) {
         ApiCall apiCall = new ApiCall();
         LocalDate date = LocalDate.now();
         String stringDate = date.toString();
@@ -122,27 +121,25 @@ public class RiskCalculator {
         double ma10 = apiCall.getMa10();
         double ma20 = apiCall.getMa20();
         double price = apiCall.GetCurrentPrice(symbol);
-        updateLabels(label,price, ma10, apiCall.getAtr() );
-        updateStyles(price, ma10, ma20, ma10Circle, ma20Circle, ma10Over20Circle);
+        handleMarketScores(price, ma10, ma20, ma10Circle, ma20Circle, ma10Over20Circle);
+        updateLabels(label,price, ma10, apiCall.getAtr());
+        updateMarketCirles(price, ma10, ma20, ma10Circle, ma20Circle, ma10Over20Circle);
     }
-    private void updateStyles(double price, double ma10, double ma20, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle) {
+    public void updateMarketCirles(double price, double ma10, double ma20, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle){
         String style = (price < ma10) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
         ma10Circle.setStyle(style);
-        if (price < ma10) {
-            marketMaScore += 0.5;
-        }
-
         style = (price < ma20) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
         ma20Circle.setStyle(style);
-        if (price < ma20) {
-            marketMaScore += 0.5;
-        }
-
         style = (ma10 < ma20) ? "-fx-fill: #e53935" : "-fx-fill: #388e3c";
         ma10Over20Circle.setStyle(style);
-        if (ma10 < ma20) {
+    }
+    private void handleMarketScores(double price, double ma10, double ma20, Circle ma10Circle, Circle ma20Circle, Circle ma10Over20Circle) {
+        if (price > ma10)
             marketMaScore += 0.5;
-        }
+        if (price > ma20)
+            marketMaScore += 0.5;
+        if (ma10 > ma20)
+            marketMaScore += 0.5;
     }
     private void updateLabels(Label label, double price, double tenMa, double atr) {
         double dist = f.formatDoubleXX(((price-tenMa)/atr));
@@ -152,7 +149,6 @@ public class RiskCalculator {
 
     public void setUpDrawDownScore(Label lblDrawdown)
     {
-        DatabaseController database = new DatabaseController();
         double maxValue = database.getPortfolioMaxValue();
         double currentValue = database.getPortFolioCurrentValue();
         double drawdown = f.formatDoubleXX(((maxValue-currentValue)/maxValue)*-100);
@@ -179,58 +175,30 @@ public class RiskCalculator {
 
     public void setUpPortfolioIcons(Circle iconPortfolioO10, Circle iconPortfolioO20, Circle iconPortfolio10O20)
     {
-        DatabaseController database = new DatabaseController();
-        double maxValue=database.getPortfolioMaxValue();
         double currentValue = database.getPortFolioCurrentValue();
         double tenMa = database.getMa10();
         double twentyMa = database.getMa20();
-        if(!(tenMa == 0))
-        {
-            if( currentValue > tenMa)
-            {
-                iconPortfolioO10.setStyle("-fx-fill: #388e3c;");
-            }
-            else
-            {
-                iconPortfolioO10.setStyle("-fx-fill: #e53935");
-            }
+        String style ="";
+        if(tenMa != 0){
+            style = (currentValue > tenMa) ? "-fx-fill: #388e3c;" : "-fx-fill: #e53935";
+            iconPortfolioO10.setStyle(style);
         }
         else
-        {
             iconPortfolioO10.setStyle("-fx-fill: #ffc233");
-        }
-        if(!(twentyMa == 0))
-        {
-            if(currentValue > twentyMa)
-            {
-                iconPortfolioO20.setStyle("-fx-fill: #388e3c;");
-            }
-            else
-            {
-                iconPortfolioO20.setStyle("-fx-fill: #e53935;");
-            }
+        if(twentyMa != 0){
+            style = (currentValue > twentyMa) ? "-fx-fill: #388e3c;" : "-fx-fill: #e53935";
+            iconPortfolioO20.setStyle(style);
         }
         else
-        {
             iconPortfolioO20.setStyle("-fx-fill: #ffc233");
-        }
-        if(!(twentyMa == 0))
-        {
-            if(tenMa > twentyMa)
-            {
-                iconPortfolio10O20.setStyle("-fx-fill: #388e3c;");
-            }
-            else
-            {
-                iconPortfolio10O20.setStyle("-fx-fill: #e53935;");
-            }
+        if(twentyMa != 0 || tenMa != 0) {
+            style = (tenMa > twentyMa) ? "-fx-fill: #388e3c;" : "-fx-fill: #e53935";
+            iconPortfolio10O20.setStyle(style);
         }
         else
-        {
             iconPortfolio10O20.setStyle("-fx-fill: #ffc233");
-        }
     }
-    }
+}
 
 
 
